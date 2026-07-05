@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "AI Pulse — Real-Time AI Intelligence",
-  description: "Aggregated, AI-summarized, and scored AI news.",
+  title: "AI Pulse — Premium AI Intelligence",
+  description: "Real-time AI intelligence aggregator, scoring engine, and executive brief.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className={`${inter.variable} ${plusJakarta.variable}`}>
+      <body className="antialiased min-h-screen">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -51,20 +51,20 @@ export default function ModelsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#050816] text-[#F8FAFC] relative font-sans selection:bg-[#6D5DF6]/30 selection:text-white">
-      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-[#6D5DF6]/5 via-transparent to-transparent pointer-events-none z-0" />
+    <div className="min-h-screen bg-ink text-textPrimary relative font-sans selection:bg-accent/30 selection:text-white">
+      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none z-0" />
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10 relative z-10 animate-fade-in">
         <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#6D5DF6] mb-1.5 block">Model Tracker</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-1.5 block">Model Tracker</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Model Intelligence</h1>
           <p className="text-sm text-textSecondary mt-1">Deep specifications, capability reviews, and adoption trend tracking for top LLMs.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredModels.map((model, idx) => (
-            <div key={idx} className="bg-[#111827] border border-white/[0.05] p-7 md:p-8 rounded-3xl hover:border-[#6D5DF6]/30 transition-all flex flex-col justify-between group shadow-md">
+            <div key={idx} className="bg-panel border border-white/[0.05] p-7 md:p-8 rounded-3xl hover:border-accent/30 transition-all flex flex-col justify-between group shadow-md">
               <div>
                 <div className="flex items-center justify-between text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-3">
                   <span>{model.maker}</span>

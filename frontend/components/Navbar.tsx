@@ -55,13 +55,13 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-white/[0.05] bg-[#050816]/75 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 w-full border-b border-white/[0.05] bg-ink/75 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           
           {/* Left: Brand Logo & Navigation */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#6D5DF6] logo-pulse shadow-[0_0_8px_#6d5df6]"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-accent logo-pulse shadow-[0_0_8px_rgba(108,99,255,0.4)]"></span>
               <span className="font-display text-xl font-extrabold tracking-tight text-textPrimary">
                 Noviqe
               </span>
@@ -98,12 +98,11 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                // If we're not on Signals page, push to Signals page to view search results dynamically
                 if (pathname !== "/signals" && pathname !== "/") {
                   router.push("/signals");
                 }
               }}
-              className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.05] bg-[#111827]/80 text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-[#6D5DF6]/50 focus:ring-1 focus:ring-[#6D5DF6]/20 transition-all"
+              className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.05] bg-panel/85 text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery("")} className="absolute inset-y-0 right-3.5 flex items-center text-zinc-500 hover:text-white text-xs font-semibold">
@@ -114,7 +113,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
 
           {/* Right: Notifications, Bookmarks, Auth */}
           <div className="flex items-center gap-3">
-            {/* Bookmarks Toggle (Redirects to signals personalized if logged in) */}
+            {/* Bookmarks Toggle */}
             {token && (
               <Link
                 href="/signals"
@@ -129,7 +128,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
 
             {/* Notification Badge Mock */}
             <div className="relative p-2 rounded-xl border border-white/[0.05] text-textSecondary hover:bg-white/[0.02] cursor-pointer hidden sm:block">
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#14B8A6] shadow-[0_0_4px_#14B8A6]"></span>
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-tealAccent shadow-[0_0_4px_currentColor]"></span>
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
@@ -155,7 +154,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                     setAuthMode("login");
                     setIsAuthModalOpen(true);
                   }}
-                  className="px-4.5 py-2 rounded-xl bg-[#6D5DF6] hover:bg-[#5a4cdb] text-xs font-bold text-white transition-all hover:scale-[1.02] shadow-lg shadow-[#6D5DF6]/10"
+                  className="px-4.5 py-2 rounded-xl bg-accent hover:bg-accent/80 text-xs font-bold text-white transition-all hover:scale-[1.02] shadow-lg shadow-accent/10"
                 >
                   Sign In
                 </button>
@@ -169,7 +168,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
       {/* AUTHENTICATION MODAL */}
       {isAuthModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-sm bg-[#111827] border border-white/[0.08] rounded-3xl p-8 shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
+          <div className="relative w-full max-w-sm bg-panel border border-white/[0.08] rounded-3xl p-8 shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
             {/* Close Button */}
             <button
               onClick={() => {
@@ -185,7 +184,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
 
             {/* Logo */}
             <div className="flex items-center gap-2 mb-6">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#6D5DF6]"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-accent"></span>
               <span className="font-display text-lg font-bold text-white">Noviqe Auth</span>
             </div>
 
@@ -205,7 +204,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white placeholder-zinc-500 outline-none focus:border-[#6D5DF6]/50 focus:ring-1 focus:ring-[#6D5DF6]/20 transition-all"
+                  className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white placeholder-zinc-500 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
                 />
               </div>
 
@@ -218,7 +217,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                   placeholder="Minimum 8 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white placeholder-zinc-500 outline-none focus:border-[#6D5DF6]/50 focus:ring-1 focus:ring-[#6D5DF6]/20 transition-all"
+                  className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white placeholder-zinc-500 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
                 />
               </div>
 
@@ -231,7 +230,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
               <button
                 type="submit"
                 disabled={authBusy}
-                className="w-full h-10 mt-2 rounded-xl bg-[#6D5DF6] hover:bg-[#5a4cdb] text-xs font-bold text-white transition-all disabled:opacity-50"
+                className="w-full h-10 mt-2 rounded-xl bg-accent hover:bg-accent/80 text-xs font-bold text-white transition-all disabled:opacity-50"
               >
                 {authBusy ? "Verifying..." : authMode === "login" ? "Sign In" : "Create Account"}
               </button>
@@ -247,7 +246,7 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
                   setAuthMode(authMode === "login" ? "register" : "login");
                   setAuthError(null);
                 }}
-                className="ml-1 text-[#6D5DF6] font-bold hover:underline"
+                className="ml-1 text-accent font-bold hover:underline"
               >
                 {authMode === "login" ? "Register" : "Sign In"}
               </button>

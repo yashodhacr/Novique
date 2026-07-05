@@ -47,13 +47,13 @@ export default function LearningPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#050816] text-[#F8FAFC] relative font-sans selection:bg-[#6D5DF6]/30 selection:text-white">
-      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-[#6D5DF6]/5 via-transparent to-transparent pointer-events-none z-0" />
+    <div className="min-h-screen bg-ink text-textPrimary relative font-sans selection:bg-accent/30 selection:text-white">
+      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none z-0" />
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10 relative z-10 animate-fade-in">
         <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#14B8A6] mb-1.5 block">Noviqe Academy</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-tealAccent mb-1.5 block">Noviqe Academy</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Learn What's Next</h1>
           <p className="text-sm text-textSecondary mt-1">Modular developer-focused micro-lessons detailing emerging protocols, techniques, and model parameters.</p>
         </div>
@@ -62,7 +62,7 @@ export default function LearningPage() {
           {filteredLessons.map((lesson, idx) => (
             <div
               key={idx}
-              className="bg-[#111827] border border-white/[0.05] p-7 md:p-8 rounded-3xl hover:border-[#6D5DF6]/30 transition-all flex flex-col justify-between group shadow-md"
+              className="bg-panel border border-white/[0.05] p-7 md:p-8 rounded-3xl hover:border-accent/30 transition-all flex flex-col justify-between group shadow-md"
             >
               <div>
                 <div className="flex items-center justify-between text-[10px] font-bold text-tealAccent uppercase tracking-widest mb-4">
@@ -82,7 +82,7 @@ export default function LearningPage() {
 
               <button
                 onClick={() => alert(`Starting lesson: ${lesson.title}`)}
-                className="w-full text-center py-2.5 bg-[#0B1220]/60 hover:bg-[#0B1220] border border-white/[0.05] hover:border-[#6D5DF6]/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all"
+                className="w-full text-center py-2.5 bg-secondaryBg/60 hover:bg-secondaryBg border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all"
               >
                 Start Learning &rarr;
               </button>

@@ -51,25 +51,25 @@ export default function OpportunitiesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#050816] text-[#F8FAFC] relative font-sans selection:bg-[#6D5DF6]/30 selection:text-white">
-      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-[#6D5DF6]/5 via-transparent to-transparent pointer-events-none z-0" />
+    <div className="min-h-screen bg-ink text-textPrimary relative font-sans selection:bg-accent/30 selection:text-white">
+      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none z-0" />
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10 relative z-10 animate-fade-in">
         <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#F4B740] mb-1.5 block">Career Signals</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-goldAccent mb-1.5 block">Career Signals</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">AI Opportunities</h1>
           <p className="text-sm text-textSecondary mt-1">High-impact skills, open-source technologies, and startups showing substantial momentum spikes.</p>
         </div>
 
         {/* AI Opportunity of the Day (Gold Featured block) */}
         {opportunities[0] && (
-          <div className="bg-[#111827] border-2 border-[#F4B740]/40 rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col md:flex-row gap-8 justify-between shadow-[0_20px_50px_rgba(244,183,64,0.06)]">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#F4B740]/2 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-panel border-2 border-goldAccent/40 rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col md:flex-row gap-8 justify-between shadow-[0_20px_50px_rgba(246,196,83,0.06)]">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-goldAccent/2 rounded-full blur-3xl pointer-events-none" />
             
             <div className="flex-1 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-black bg-[#F4B740] px-3.5 py-0.5 rounded-full w-max mb-3 block">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-black bg-goldAccent px-3.5 py-0.5 rounded-full w-max mb-3 block">
                   AI Opportunity of the Day
                 </span>
                 <h3 className="text-2xl md:text-3xl font-display font-extrabold text-white leading-tight mb-2">
@@ -106,7 +106,7 @@ export default function OpportunitiesPage() {
             <div className="md:w-1/6 flex items-center justify-end">
               <button
                 onClick={() => alert(`Starting: ${opportunities[0].title}`)}
-                className="w-full md:w-auto px-5 py-3 rounded-xl font-bold bg-[#F4B740] hover:bg-[#e0a230] text-black transition-all text-xs text-center shadow-lg shadow-[#F4B740]/10"
+                className="w-full md:w-auto px-5 py-3 rounded-xl font-bold bg-goldAccent hover:bg-[#e0b23f] text-black transition-all text-xs text-center shadow-lg shadow-goldAccent/10"
               >
                 Start Learning
               </button>
@@ -119,12 +119,12 @@ export default function OpportunitiesPage() {
           {filteredOpps.slice(1).map((opp, idx) => (
             <div
               key={idx}
-              className="bg-[#111827] border border-white/[0.05] p-6 rounded-3xl hover:border-accent/30 hover:bg-[#111827]/80 transition-all flex flex-col justify-between group shadow-md"
+              className="bg-panel border border-white/[0.05] p-6 rounded-3xl hover:border-accent/30 hover:bg-panel/80 transition-all flex flex-col justify-between group shadow-md"
             >
               <div>
                 <div className="flex items-center justify-between text-[10px] font-bold text-accent uppercase tracking-widest mb-4">
                   <span>{opp.type}</span>
-                  <span className="text-[#14B8A6]">{opp.impact} Impact</span>
+                  <span className="text-tealAccent">{opp.impact} Impact</span>
                 </div>
                 <h4 className="text-lg font-display font-extrabold text-white mb-2 group-hover:text-accent transition-colors leading-snug">{opp.title}</h4>
                 <p className="text-xs text-textSecondary leading-relaxed mb-6">{opp.reason}</p>
@@ -137,7 +137,7 @@ export default function OpportunitiesPage() {
                 </div>
                 <button
                   onClick={() => alert(`Starting: ${opp.title}`)}
-                  className="w-full text-center py-2 bg-[#0B1220]/60 hover:bg-[#0B1220] border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all"
+                  className="w-full text-center py-2 bg-secondaryBg/60 hover:bg-secondaryBg border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all"
                 >
                   Start Learning &rarr;
                 </button>

@@ -90,16 +90,16 @@ export default function SignalsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#050816] text-[#F8FAFC] relative font-sans selection:bg-[#6D5DF6]/30 selection:text-white">
+    <div className="min-h-screen bg-ink text-textPrimary relative font-sans selection:bg-accent/30 selection:text-white">
       {/* Mesh Glow Background */}
-      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-[#6D5DF6]/5 via-transparent to-transparent pointer-events-none z-0" />
+      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none z-0" />
 
       {/* Navbar */}
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10 relative z-10 animate-fade-in">
         <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#6D5DF6] mb-1.5 block">Noviqe Pipeline</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-accent mb-1.5 block">Noviqe Pipeline</span>
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">Market Signals</h1>
           <p className="text-sm text-textSecondary mt-1">Real-time intelligence aggregation of corporate, academic and open-source updates.</p>
         </div>
@@ -121,7 +121,7 @@ export default function SignalsPage() {
               <div className="flex flex-wrap items-center gap-3">
                 {/* Personalization Selector */}
                 {token && (
-                  <div className="bg-[#111827] border border-white/[0.05] rounded-xl p-1 flex">
+                  <div className="bg-panel border border-white/[0.05] rounded-xl p-1 flex">
                     <button
                       onClick={() => setMode("discover")}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -142,7 +142,7 @@ export default function SignalsPage() {
                 )}
 
                 {/* Sort selector */}
-                <div className="bg-[#111827] border border-white/[0.05] rounded-xl p-1 flex">
+                <div className="bg-panel border border-white/[0.05] rounded-xl p-1 flex">
                   {SORTS.map((s) => (
                     <button
                       key={s.key}
@@ -175,7 +175,7 @@ export default function SignalsPage() {
               ))}
               {searchQuery && (
                 <span className="ml-auto text-xs text-zinc-400 flex items-center gap-2">
-                  Filtering: <strong className="text-[#6D5DF6]">"{searchQuery}"</strong>
+                  Filtering: <strong className="text-accent">"{searchQuery}"</strong>
                   <button onClick={() => setSearchQuery("")} className="text-zinc-500 hover:text-white font-bold">&times;</button>
                 </span>
               )}
@@ -203,7 +203,7 @@ export default function SignalsPage() {
               ))}
 
               {filteredArticles?.length === 0 && (
-                <div className="bg-[#111827] border border-white/[0.05] p-10 rounded-3xl text-center text-[#94A3B8] text-sm">
+                <div className="bg-panel border border-white/[0.05] p-10 rounded-3xl text-center text-[#94A3B8] text-sm">
                   No signals match the current filters.
                 </div>
               )}
@@ -215,9 +215,9 @@ export default function SignalsPage() {
           <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
             
             {/* Sidebar Block 1: What's Happening */}
-            <div className="bg-[#111827] border border-white/[0.05] rounded-3xl p-6 shadow-md">
+            <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 shadow-md">
               <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6D5DF6]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                 What's Happening
               </h4>
               <div className="flex flex-col gap-4 text-xs font-normal">
@@ -228,12 +228,12 @@ export default function SignalsPage() {
                   { title: "Venture index reports 12% rise in active robotics seed funding.", velocity: "+12.2%" },
                 ].map((item, idx) => (
                   <div key={idx} className="border-b border-white/[0.04] pb-3 last:border-0 last:pb-0">
-                    <p className="text-zinc-300 font-semibold leading-relaxed hover:text-[#6D5DF6] cursor-pointer" onClick={() => setSearchQuery(item.title.substring(0, 15))}>
+                    <p className="text-zinc-300 font-semibold leading-relaxed hover:text-accent cursor-pointer" onClick={() => setSearchQuery(item.title.substring(0, 15))}>
                       {item.title}
                     </p>
                     <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-1">
                       <span>Ref #{idx + 104}</span>
-                      <span className="text-[#10B981] font-bold">{item.velocity}</span>
+                      <span className="text-positive font-bold">{item.velocity}</span>
                     </div>
                   </div>
                 ))}
@@ -241,9 +241,9 @@ export default function SignalsPage() {
             </div>
 
             {/* Sidebar Block 2: Contributors */}
-            <div className="bg-[#111827] border border-white/[0.05] rounded-3xl p-6 shadow-md">
+            <div className="bg-panel border border-white/[0.05] rounded-3xl p-6 shadow-md">
               <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-tealAccent" />
                 Top Contributors
               </h4>
               <div className="flex flex-col gap-3">
@@ -257,7 +257,7 @@ export default function SignalsPage() {
                       <span className="block font-bold text-zinc-200">{contrib.name}</span>
                       <span className="text-[10px] text-zinc-500 mt-0.5 block">{contrib.articles}</span>
                     </div>
-                    <span className="text-[#6D5DF6] text-[10px] font-bold">Active</span>
+                    <span className="text-accent text-[10px] font-bold">Active</span>
                   </div>
                 ))}
               </div>

@@ -13,8 +13,8 @@
   }
 
   body {
-    background-color: #050816;
-    color: #F8FAFC;
+    background-color: #07111F;
+    color: #F7F9FC;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -28,17 +28,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #050816;
+  background: #07111F;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #111827;
+  background: #101B2D;
   border-radius: 999px;
-  border: 2px solid #050816;
+  border: 2px solid #07111F;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6D5DF6;
+  background: #6C63FF;
 }
 
 /* Grid & glow effects mimicking Linear / Vercel */
@@ -50,7 +50,7 @@
 }
 
 .radial-glow {
-  background: radial-gradient(circle 800px at 50% -200px, rgba(109, 93, 246, 0.09), transparent);
+  background: radial-gradient(circle 800px at 50% -200px, rgba(108, 99, 255, 0.08), transparent);
 }
 
 .glow-hover {
@@ -58,13 +58,13 @@
 }
 
 .glow-hover:hover {
-  box-shadow: 0 0 35px 0 rgba(109, 93, 246, 0.08);
-  border-color: rgba(109, 93, 246, 0.25);
+  box-shadow: 0 0 35px 0 rgba(108, 99, 255, 0.08);
+  border-color: rgba(108, 99, 255, 0.25);
   transform: translateY(-2px);
 }
 
 .glass-panel {
-  background: rgba(17, 24, 39, 0.65);
+  background: rgba(16, 27, 45, 0.65);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -72,25 +72,25 @@
 
 /* Text Gradients */
 .text-gradient {
-  background: linear-gradient(135deg, #F8FAFC 30%, #C084FC 100%);
+  background: linear-gradient(135deg, #F7F9FC 30%, #C084FC 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-purple {
-  background: linear-gradient(135deg, #C084FC 30%, #6D5DF6 100%);
+  background: linear-gradient(135deg, #C084FC 30%, #6C63FF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-teal {
-  background: linear-gradient(135deg, #14B8A6 30%, #6D5DF6 100%);
+  background: linear-gradient(135deg, #16C79A 30%, #6C63FF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #F4B740 30%, #F59E0B 100%);
+  background: linear-gradient(135deg, #F6C453 30%, #F59E0B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -106,8 +106,8 @@
 }
 
 @keyframes logoPulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(109, 93, 246, 0.3)); }
-  50% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(109, 93, 246, 0.7)); }
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(108, 99, 255, 0.3)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(108, 99, 255, 0.7)); }
 }
 
 .logo-pulse {

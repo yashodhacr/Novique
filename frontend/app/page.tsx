@@ -372,9 +372,10 @@ export default function Home() {
               { name: "Mistral", momentum: "8.9/10", launch: "Codestral 22B coder", hiring: "Moderate", funding: "$640M raised", focus: "Efficient Edge Models" },
               { name: "Cursor (Anysphere)", momentum: "9.7/10", launch: "Composer tab & loops", hiring: "Rapid", funding: "$30M Series A", focus: "AI Developer Tooling" },
             ].map((company) => (
-              <div
+              <Link
                 key={company.name}
-                className="bg-[#17253A] border border-white/[0.05] p-5 rounded-3xl hover:border-[#6C63FF]/30 transition-all flex flex-col justify-between gap-4 group"
+                href={`/companies/${company.name.toLowerCase().split(" ")[0].replace(/[()]/g, "")}`}
+                className="bg-[#17253A] border border-white/[0.05] p-5 rounded-3xl hover:border-[#6C63FF]/30 transition-all flex flex-col justify-between gap-4 group text-left"
               >
                 <div>
                   <h4 className="text-sm font-bold text-white group-hover:text-accent transition-colors">{company.name}</h4>
@@ -387,7 +388,7 @@ export default function Home() {
                 <div className="border-t border-white/[0.04] pt-3 text-[11px] text-[#9AA8BD]">
                   <span>Latest: <strong className="text-white font-medium">{company.launch}</strong></span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

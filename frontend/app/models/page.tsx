@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
+import Link from "next/link";
 
 export default function ModelsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +65,11 @@ export default function ModelsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredModels.map((model, idx) => (
-            <div key={idx} className="bg-panel border border-white/[0.05] p-7 md:p-8 rounded-3xl hover:border-accent/30 transition-all flex flex-col justify-between group shadow-md">
+            <Link
+              key={idx}
+              href={`/models/${model.name.toLowerCase().replace(/\s+/g, "-")}`}
+              className="bg-panel border border-white/[0.05] p-7 md:p-8 rounded-3xl hover:border-accent/30 transition-all flex flex-col justify-between group shadow-md text-left"
+            >
               <div>
                 <div className="flex items-center justify-between text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-3">
                   <span>{model.maker}</span>
@@ -87,7 +92,7 @@ export default function ModelsPage() {
                   <span className="font-semibold text-tealAccent text-right">{model.performance}</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </main>

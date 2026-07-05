@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/auth-context";
@@ -9,6 +9,40 @@ interface Props {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
 }
+
+interface SuggestionItem {
+  title: string;
+  category: "company" | "model" | "research" | "technology";
+  route: string;
+}
+
+const SEARCH_CATALOG: SuggestionItem[] = [
+  // Companies
+  { title: "OpenAI", category: "company", route: "/companies/openai" },
+  { title: "Anthropic", category: "company", route: "/companies/anthropic" },
+  { title: "Google DeepMind", category: "company", route: "/companies/google-deepmind" },
+  { title: "Meta AI", category: "company", route: "/companies/meta-ai" },
+  { title: "Mistral", category: "company", route: "/companies/mistral" },
+  { title: "Cursor", category: "company", route: "/companies/cursor" },
+  { title: "Perplexity", category: "company", route: "/companies/perplexity" },
+  // Models
+  { title: "Claude 3.5 Sonnet", category: "model", route: "/models/claude-3-5-sonnet" },
+  { title: "GPT-4o", category: "model", route: "/models/gpt-4o" },
+  { title: "Llama 3.1 405B", category: "model", route: "/models/llama-3-1-405b" },
+  { title: "Gemini 1.5 Pro", category: "model", route: "/models/gemini-1-5-pro" },
+  // Research
+  { title: "KAN: Kolmogorov-Arnold Networks", category: "research", route: "/research" },
+  { title: "Model Context Protocol", category: "research", route: "/research" },
+  { title: "Attention Is All You Need", category: "research", route: "/research" },
+  { title: "Direct Preference Optimization", category: "research", route: "/research" },
+  // Technologies / Topics
+  { title: "AI Agents", category: "technology", route: "/signals" },
+  { title: "Model Context Protocol (MCP)", category: "technology", route: "/signals" },
+  { title: "Reasoning Models", category: "technology", route: "/signals" },
+  { title: "Robotics", category: "technology", route: "/signals" },
+  { title: "Voice AI", category: "technology", route: "/signals" },
+  { title: "Fine-tuning", category: "technology", route: "/signals" },
+];
 
 export function Navbar({ searchQuery, setSearchQuery }: Props) {
   const { token, user, login, register, logout, ready } = useAuth();
@@ -22,6 +56,20 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
+
+  // Suggestions state
+  const [focused, setFocused] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setFocused(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +99,15 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
     { label: "Models", path: "/models" },
     { label: "Learning", path: "/learning" },
     { label: "Opportunities", path: "/opportunities" },
+    { label: "Reports", path: "/weekly-reports" },
   ];
+
+  // Suggestions filtering
+  const suggestions = searchQuery.trim()
+    ? SEARCH_CATALOG.filter((item) =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 6)
+    : [];
 
   return (
     <>
@@ -85,8 +141,8 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
             </nav>
           </div>
 
-          {/* Center: Ask Noviqe Search Bar */}
-          <div className="flex-1 max-w-md relative hidden md:block">
+          {/* Center: Ask Noviqe Search Bar with intelligent suggestions */}
+          <div ref={containerRef} className="flex-1 max-w-md relative hidden md:block">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-500">
               <svg className="w-4 h-4 text-textSecondary" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -96,32 +152,82 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
               type="text"
               placeholder="Search companies, papers, models, AI trends, funding, technologies..."
               value={searchQuery}
+              onFocus={() => setFocused(true)}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                if (pathname !== "/signals" && pathname !== "/") {
-                  router.push("/signals");
-                }
+                setFocused(true);
               }}
               className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.05] bg-panel/85 text-xs font-semibold text-textPrimary placeholder-textSecondary/55 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
             />
+            
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute inset-y-0 right-3.5 flex items-center text-zinc-500 hover:text-white text-xs font-semibold">
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setFocused(false);
+                }}
+                className="absolute inset-y-0 right-3.5 flex items-center text-zinc-500 hover:text-white text-xs font-semibold"
+              >
                 Clear
               </button>
             )}
+
+            {/* Suggestions dropdown */}
+            {focused && suggestions.length > 0 && (
+              <div className="absolute top-12 left-0 right-0 bg-[#101B2D] border border-white/[0.08] rounded-2xl p-4 shadow-[0_16px_36px_rgba(0,0,0,0.5)] flex flex-col gap-3 z-50">
+                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Intelligent Suggestions</span>
+                <div className="flex flex-col gap-1.5">
+                  {suggestions.map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setFocused(false);
+                        router.push(item.route);
+                        if (item.category === "technology") {
+                          setSearchQuery(item.title);
+                        } else {
+                          setSearchQuery("");
+                        }
+                      }}
+                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/[0.03] transition-all text-left"
+                    >
+                      <span className="text-xs text-white font-semibold">{item.title}</span>
+                      <span className="text-[9px] text-[#16C79A] bg-[#16C79A]/10 border border-[#16C79A]/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-bold">
+                        {item.category}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Right: Notifications, Bookmarks, Auth */}
+          {/* Right: Saved, Notifications, Auth */}
           <div className="flex items-center gap-3">
-            {/* Bookmarks Toggle */}
-            {token && (
+            {/* Bookmarks Toggle linking directly to Saved Page */}
+            <Link
+              href="/saved"
+              title="Saved Library"
+              className={`p-2 rounded-xl border border-white/[0.05] transition-all hover:bg-white/[0.02] ${
+                pathname === "/saved" ? "text-accent border-accent/20 bg-accent/5" : "text-textSecondary"
+              }`}
+            >
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+              </svg>
+            </Link>
+
+            {/* Profile link */}
+            {user && (
               <Link
-                href="/signals"
-                title="View Saved Signals"
-                className="p-2 rounded-xl border border-white/[0.05] text-textSecondary hover:bg-white/[0.02]"
+                href="/profile"
+                title="Profile"
+                className={`p-2 rounded-xl border border-white/[0.05] transition-all hover:bg-white/[0.02] ${
+                  pathname === "/profile" ? "text-accent border-accent/20 bg-accent/5" : "text-textSecondary"
+                }`}
               >
                 <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </Link>
             )}
@@ -134,20 +240,15 @@ export function Navbar({ searchQuery, setSearchQuery }: Props) {
               </svg>
             </div>
 
-            {/* Profile Action */}
+            {/* Auth Action */}
             {ready && (
               user ? (
-                <div className="flex items-center gap-3 pl-3 border-l border-white/[0.08]">
-                  <span className="text-xs text-textSecondary font-semibold hidden md:inline">
-                    {user.email.split("@")[0]}
-                  </span>
-                  <button
-                    onClick={logout}
-                    className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-400 hover:text-white hover:border-zinc-700 transition-all"
-                  >
-                    Sign Out
-                  </button>
-                </div>
+                <button
+                  onClick={logout}
+                  className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-400 hover:text-white hover:border-zinc-700 transition-all"
+                >
+                  Sign Out
+                </button>
               ) : (
                 <button
                   onClick={() => {

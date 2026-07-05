@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
+import Link from "next/link";
 
 export default function CompaniesPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,9 +36,10 @@ export default function CompaniesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCompanies.map((company, idx) => (
-            <div
+            <Link
               key={idx}
-              className="bg-panel border border-white/[0.05] p-6 rounded-3xl hover:border-accent/30 hover:bg-panel/80 transition-all flex flex-col justify-between gap-6 group shadow-md"
+              href={`/companies/${company.name.toLowerCase().split(" ")[0].replace(/[()]/g, "")}`}
+              className="bg-panel border border-white/[0.05] p-6 rounded-3xl hover:border-accent/30 hover:bg-panel/85 transition-all flex flex-col justify-between gap-6 group shadow-md text-left"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -68,7 +70,7 @@ export default function CompaniesPage() {
                   <span className="font-semibold text-textSecondary text-right">{company.news}</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </main>

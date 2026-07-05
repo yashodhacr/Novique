@@ -8,14 +8,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#070711",
-        secondaryBg: "#0C0F18",
-        panel: "#121625",
-        edge: "rgba(255,255,255,0.06)",
+        ink: "#050816",
+        secondaryBg: "#0B1220",
+        panel: "#111827",
+        edge: "rgba(255,255,255,0.05)",
         muted: "#94A3B8",
-        accent: "#8B5CF6",
-        cyanAccent: "#22D3EE",
-        positive: "#34D399",
+        accent: "#6D5DF6",
+        tealAccent: "#14B8A6",
+        goldAccent: "#F4B740",
+        positive: "#10B981",
         warning: "#F59E0B",
         negative: "#F43F5E",
         textPrimary: "#F8FAFC",

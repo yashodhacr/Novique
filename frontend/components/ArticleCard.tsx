@@ -74,39 +74,45 @@ export function ArticleCard({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Determine category badge icon
+  // Determine category badge icon & color
   const getCategoryBadge = () => {
     const topics = (article.topics ?? []).map((t) => t.toLowerCase());
     if (article.kind === "paper") return "📚 Research Intelligence";
     if (topics.some((t) => t.includes("agent"))) return "🤖 AI Agents";
     if (topics.some((t) => t.includes("mcp"))) return "⚡ MCP Signals";
-    if (topics.some((t) => t.includes("model"))) return "🧠 reasoning Models";
+    if (topics.some((t) => t.includes("model"))) return "🧠 Reasoning Models";
     if (topics.some((t) => t.includes("robot"))) return "🦾 Robotics";
     if (topics.some((t) => t.includes("voice") || t.includes("audio"))) return "🎙️ Voice AI";
     if (topics.some((t) => t.includes("funding") || t.includes("startup"))) return "🚀 Startups / Funding";
     return "💡 General AI";
   };
 
-  // Color ranges for scores
+  const isResearch = article.kind === "paper";
+
+  // Score colors based on thresholds
   const getScoreColor = (score: number) => {
-    if (score >= 70) return "text-[#8B5CF6] bg-[#8B5CF6]/10 border-[#8B5CF6]/20";
-    if (score >= 45) return "text-[#22D3EE] bg-[#22D3EE]/10 border-[#22D3EE]/20";
-    return "text-zinc-400 bg-white/[0.03] border-white/[0.06]";
+    if (score >= 70) return "text-accent border-accent/20 bg-accent/5";
+    if (score >= 45) return "text-tealAccent border-tealAccent/20 bg-tealAccent/5";
+    return "text-zinc-400 border-white/[0.04] bg-white/[0.02]";
   };
 
   return (
-    <article className="group relative rounded-3xl border border-white/[0.06] bg-[#121625] p-7 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8B5CF6]/30 hover:bg-[#121625]/90 hover:shadow-[0_16px_36px_rgba(139,92,246,0.06)]">
+    <article className="group relative rounded-3xl border border-edge bg-panel p-7 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/30 hover:bg-panel/90 hover:shadow-[0_16px_36px_rgba(109,93,246,0.06)]">
       
       {/* Top Header: Category, Source & Metadata */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
         <div className="flex flex-wrap items-center gap-3">
           {/* Category Badge */}
-          <span className="inline-flex items-center rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 px-3.5 py-1 text-xs font-semibold text-[#C084FC]">
+          <span className={`inline-flex items-center rounded-full border px-3.5 py-1 text-xs font-semibold ${
+            isResearch 
+              ? "bg-tealAccent/10 border-tealAccent/20 text-tealAccent" 
+              : "bg-accent/10 border-accent/20 text-accent"
+          }`}>
             {getCategoryBadge()}
           </span>
-          <span className="text-zinc-600">·</span>
+          <span className="text-zinc-700">·</span>
           <span className="text-xs font-semibold text-zinc-400">{article.source}</span>
-          <span className="text-zinc-600">·</span>
+          <span className="text-zinc-700">·</span>
           <span className="text-xs text-zinc-500">{timeAgo(article.published_at)}</span>
 
           {/* Topic Pills */}
@@ -120,8 +126,8 @@ export function ArticleCard({
                     onClick={() => onToggleFollow(t)}
                     className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide transition-all ${
                       isFollowed
-                        ? "border-[#8B5CF6] bg-[#8B5CF6]/20 text-[#C084FC]"
-                        : "border-white/[0.04] bg-white/[0.02] text-zinc-400 hover:border-[#8B5CF6]/30 hover:text-zinc-300"
+                        ? "border-accent bg-accent/20 text-textPrimary"
+                        : "border-white/[0.04] bg-white/[0.02] text-zinc-400 hover:border-accent/30 hover:text-zinc-300"
                     }`}
                   >
                     {isFollowed ? "✓ " : "+ "}
@@ -149,7 +155,7 @@ export function ArticleCard({
               title={bookmarked ? "Remove Bookmark" : "Bookmark Brief"}
               className={`p-2 rounded-xl transition-all border ${
                 bookmarked
-                  ? "text-[#8B5CF6] border-[#8B5CF6]/30 bg-[#8B5CF6]/10"
+                  ? "text-accent border-accent/30 bg-accent/10"
                   : "text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.04]"
               }`}
             >
@@ -165,7 +171,7 @@ export function ArticleCard({
             className="p-2 rounded-xl transition-all border text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.04] flex items-center gap-1"
           >
             {copied ? (
-              <span className="text-[10px] text-[#22D3EE] font-bold px-1">Copied!</span>
+              <span className="text-[10px] text-tealAccent font-bold px-1">Copied!</span>
             ) : (
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186l5.57 3.285m-5.57-3.285l5.57-3.285m0 0a2.25 2.25 0 103.935-2.186 2.25 2.25 0 00-3.935 2.186zm0-2.186L12 14.83m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186z" />
@@ -175,8 +181,8 @@ export function ArticleCard({
         </div>
       </div>
 
-      {/* Middle: Title */}
-      <h3 className="text-xl md:text-2xl font-display font-extrabold tracking-tight text-[#F8FAFC] mb-3 leading-snug group-hover:text-[#C084FC] transition-colors">
+      {/* Headline */}
+      <h3 className="text-xl md:text-2xl font-display font-extrabold tracking-tight text-textPrimary mb-3 leading-snug group-hover:text-accent transition-colors">
         <a href={article.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
           {article.title}
         </a>
@@ -184,7 +190,7 @@ export function ArticleCard({
 
       {/* 30-Second Summary */}
       {article.summary_30s && (
-        <p className="text-sm md:text-base leading-relaxed text-[#94A3B8] mb-5 font-normal">
+        <p className="text-sm md:text-base leading-relaxed text-textSecondary mb-5 font-normal">
           {article.summary_30s}
         </p>
       )}
@@ -193,11 +199,11 @@ export function ArticleCard({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {/* Why it Matters */}
         {article.why_it_matters && (
-          <div className="bg-[#8B5CF6]/[0.02] border-l-2 border-[#8B5CF6] px-4 py-3.5 rounded-r-2xl">
-            <span className="block text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-1">
+          <div className="bg-accent/[0.01] border-l-2 border-accent px-4 py-3.5 rounded-r-2xl">
+            <span className="block text-[10px] font-bold text-accent uppercase tracking-widest mb-1">
               Why it Matters
             </span>
-            <p className="text-xs md:text-sm leading-relaxed text-[#F8FAFC] font-medium">
+            <p className="text-xs md:text-sm leading-relaxed text-textPrimary font-medium">
               {article.why_it_matters}
             </p>
           </div>
@@ -205,11 +211,11 @@ export function ArticleCard({
 
         {/* Who is Impacted */}
         {article.who_is_impacted && (
-          <div className="bg-[#22D3EE]/[0.02] border-l-2 border-[#22D3EE] px-4 py-3.5 rounded-r-2xl">
-            <span className="block text-[10px] font-bold text-[#22D3EE] uppercase tracking-widest mb-1">
+          <div className="bg-tealAccent/[0.01] border-l-2 border-tealAccent px-4 py-3.5 rounded-r-2xl">
+            <span className="block text-[10px] font-bold text-tealAccent uppercase tracking-widest mb-1">
               Who is Impacted
             </span>
-            <p className="text-xs md:text-sm leading-relaxed text-[#F8FAFC] font-medium">
+            <p className="text-xs md:text-sm leading-relaxed text-textPrimary font-medium">
               {article.who_is_impacted}
             </p>
           </div>
@@ -217,50 +223,50 @@ export function ArticleCard({
       </div>
 
       {/* Recommended Action Grid (Visually Distinct Container) */}
-      <div className="mt-6 border-t border-white/[0.06] pt-6">
+      <div className="mt-6 border-t border-white/[0.05] pt-6">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500">
             Recommended Action
           </span>
-          <div className="h-[1px] bg-white/[0.06] flex-1"></div>
+          <div className="h-[1px] bg-white/[0.05] flex-1"></div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Software Engineer */}
-          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-[#8B5CF6]/20">
+          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-accent/20">
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]"></span>
-              <span className="text-[10px] font-bold text-[#C084FC] uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+              <span className="text-[10px] font-bold text-accent uppercase tracking-wider">
                 Software Engineers
               </span>
             </div>
-            <p className="text-xs text-[#94A3B8] leading-relaxed font-normal">
+            <p className="text-xs text-textSecondary leading-relaxed font-normal">
               {actions.engineer}
             </p>
           </div>
 
           {/* Founder */}
-          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-[#8B5CF6]/20">
+          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-accent/20">
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE]"></span>
-              <span className="text-[10px] font-bold text-[#22D3EE] uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-tealAccent"></span>
+              <span className="text-[10px] font-bold text-tealAccent uppercase tracking-wider">
                 Founders
               </span>
             </div>
-            <p className="text-xs text-[#94A3B8] leading-relaxed font-normal">
+            <p className="text-xs text-textSecondary leading-relaxed font-normal">
               {actions.founder}
             </p>
           </div>
 
           {/* AI Researcher */}
-          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-[#8B5CF6]/20">
+          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-accent/20">
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]"></span>
-              <span className="text-[10px] font-bold text-[#34D399] uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-goldAccent"></span>
+              <span className="text-[10px] font-bold text-goldAccent uppercase tracking-wider">
                 AI Researchers
               </span>
             </div>
-            <p className="text-xs text-[#94A3B8] leading-relaxed font-normal">
+            <p className="text-xs text-textSecondary leading-relaxed font-normal">
               {actions.researcher}
             </p>
           </div>
@@ -268,7 +274,7 @@ export function ArticleCard({
       </div>
 
       {/* Card Footer: Scores & Original Link */}
-      <div className="mt-6 pt-5 border-t border-white/[0.06] flex items-center justify-between flex-wrap gap-4">
+      <div className="mt-6 pt-5 border-t border-white/[0.05] flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           {/* Impact Score Pill */}
           <div className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full border text-xs font-semibold ${getScoreColor(article.impact_score)}`}>
@@ -278,7 +284,7 @@ export function ArticleCard({
             <span>Impact: {article.impact_score.toFixed(0)}</span>
           </div>
 
-          {/* Momentum Score Pill (formerly Trend Score) */}
+          {/* Momentum Score Pill */}
           <div className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full border text-xs font-semibold ${getScoreColor(article.trend_score)}`}>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22" />
@@ -299,7 +305,7 @@ export function ArticleCard({
           href={article.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs font-bold text-[#8B5CF6] hover:text-[#C084FC] transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-bold text-accent hover:text-accent/80 transition-colors"
         >
           Read Source
           <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

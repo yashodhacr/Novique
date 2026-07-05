@@ -1,0 +1,151 @@
+"use client";
+
+import { useState } from "react";
+import { Navbar } from "@/components/Navbar";
+
+export default function OpportunitiesPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const opportunities = [
+    {
+      type: "Skill",
+      title: "Model Context Protocol (MCP) Server Development",
+      reason: "Mentions in job postings for AI integration engineers have spiked 38% this week. Companies are standardizing context loading pipelines.",
+      time: "20 minutes",
+      impact: "High",
+      adopters: ["Anthropic", "OpenAI", "Microsoft"],
+      highlight: true
+    },
+    {
+      type: "Technology",
+      title: "Local LLM Fine-Tuning with Unsloth",
+      reason: "Unsloth training speedups reduce Llama 3 fine-tuning times by 2x to 5x. Essential for startups building domain-specific models.",
+      time: "45 minutes",
+      impact: "Medium-High",
+      adopters: ["Anysphere (Cursor)", "Replicate", "Together AI"],
+      highlight: false
+    },
+    {
+      type: "Research Paper Practice",
+      title: "Implementing Kolmogorov-Arnold Networks (KANs)",
+      reason: "KANs have shown a high performance-to-compute ratio in scientific models. High demand for engineers who can convert KAN research into production code.",
+      time: "60 minutes",
+      impact: "High",
+      adopters: ["MIT Physics Labs", "DeepMind Biological Research"],
+      highlight: false
+    },
+    {
+      type: "Startup Integration",
+      title: "Voice AI Agent Pipeline Engineering",
+      reason: "Low-latency WebSocket voice bots are replacing legacy IVR telephone directories. Massive demand for software engineers who can configure real-time audio channels.",
+      time: "30 minutes",
+      impact: "Very High",
+      adopters: ["Retell AI", "Vapi", "Bland AI"],
+      highlight: false
+    }
+  ];
+
+  const filteredOpps = opportunities.filter((o) => {
+    const q = searchQuery.toLowerCase();
+    return o.title.toLowerCase().includes(q) || o.reason.toLowerCase().includes(q);
+  });
+
+  return (
+    <div className="min-h-screen bg-[#050816] text-[#F8FAFC] relative font-sans selection:bg-[#6D5DF6]/30 selection:text-white">
+      <div className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-[#6D5DF6]/5 via-transparent to-transparent pointer-events-none z-0" />
+      <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+      <main className="max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10 relative z-10 animate-fade-in">
+        <div>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#F4B740] mb-1.5 block">Career Signals</span>
+          <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white">AI Opportunities</h1>
+          <p className="text-sm text-textSecondary mt-1">High-impact skills, open-source technologies, and startups showing substantial momentum spikes.</p>
+        </div>
+
+        {/* AI Opportunity of the Day (Gold Featured block) */}
+        {opportunities[0] && (
+          <div className="bg-[#111827] border-2 border-[#F4B740]/40 rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col md:flex-row gap-8 justify-between shadow-[0_20px_50px_rgba(244,183,64,0.06)]">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#F4B740]/2 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-black bg-[#F4B740] px-3.5 py-0.5 rounded-full w-max mb-3 block">
+                  AI Opportunity of the Day
+                </span>
+                <h3 className="text-2xl md:text-3xl font-display font-extrabold text-white leading-tight mb-2">
+                  {opportunities[0].title}
+                </h3>
+                <p className="text-sm text-textSecondary mt-2 leading-relaxed max-w-2xl">
+                  {opportunities[0].reason}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-white/[0.06] pt-5 mt-5">
+                <div>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Type</span>
+                  <span className="text-xs font-semibold text-white">{opportunities[0].type}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Learning Time</span>
+                  <span className="text-xs font-semibold text-white">{opportunities[0].time}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Career Impact</span>
+                  <span className="text-xs font-semibold text-tealAccent">{opportunities[0].impact}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Adopters</span>
+                  <div className="flex flex-wrap gap-1 mt-0.5">
+                    {opportunities[0].adopters.map((a) => (
+                      <span key={a} className="text-[9px] bg-white/[0.04] px-1 py-0.5 rounded text-white">{a}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="md:w-1/6 flex items-center justify-end">
+              <button
+                onClick={() => alert(`Starting: ${opportunities[0].title}`)}
+                className="w-full md:w-auto px-5 py-3 rounded-xl font-bold bg-[#F4B740] hover:bg-[#e0a230] text-black transition-all text-xs text-center shadow-lg shadow-[#F4B740]/10"
+              >
+                Start Learning
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Regular Opportunities Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+          {filteredOpps.slice(1).map((opp, idx) => (
+            <div
+              key={idx}
+              className="bg-[#111827] border border-white/[0.05] p-6 rounded-3xl hover:border-accent/30 hover:bg-[#111827]/80 transition-all flex flex-col justify-between group shadow-md"
+            >
+              <div>
+                <div className="flex items-center justify-between text-[10px] font-bold text-accent uppercase tracking-widest mb-4">
+                  <span>{opp.type}</span>
+                  <span className="text-[#14B8A6]">{opp.impact} Impact</span>
+                </div>
+                <h4 className="text-lg font-display font-extrabold text-white mb-2 group-hover:text-accent transition-colors leading-snug">{opp.title}</h4>
+                <p className="text-xs text-textSecondary leading-relaxed mb-6">{opp.reason}</p>
+              </div>
+
+              <div className="border-t border-white/[0.04] pt-4 mt-auto">
+                <div className="flex justify-between text-xs mb-4">
+                  <span className="text-zinc-500">Adopters:</span>
+                  <span className="font-semibold text-white">{opp.adopters.join(", ")}</span>
+                </div>
+                <button
+                  onClick={() => alert(`Starting: ${opp.title}`)}
+                  className="w-full text-center py-2 bg-[#0B1220]/60 hover:bg-[#0B1220] border border-white/[0.05] hover:border-accent/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all"
+                >
+                  Start Learning &rarr;
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}

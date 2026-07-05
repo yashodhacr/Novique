@@ -1,12 +1,11 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { fetchFeed } from "@/lib/api";
 import * as authApi from "@/lib/auth";
 import type { Kind, Sort } from "@/lib/types";
 import { ArticleCard } from "@/components/ArticleCard";
-import { AuthBar } from "@/components/AuthBar";
 import { useAuth } from "./auth-context";
 
 const SORTS: { key: Sort; label: string }[] = [
@@ -24,7 +23,7 @@ const KINDS: { key: Kind; label: string }[] = [
 type Mode = "discover" | "foryou";
 
 export default function Home() {
-  const { token, user } = useAuth();
+  const { token, user, login, register, logout, ready } = useAuth();
   const qc = useQueryClient();
   const [sort, setSort] = useState<Sort>("impact");
   const [kind, setKind] = useState<Kind>("all");
@@ -32,13 +31,39 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const effectiveMode: Mode = token ? mode : "discover";
 
+  // Auth Modal State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authBusy, setAuthBusy] = useState(false);
+
+  // Brief Countdown Timer State (5 minutes loop)
+  const [secondsLeft, setSecondsLeft] = useState(300);
+
+  // References for scrolling
   const feedRef = useRef<HTMLDivElement>(null);
   const researchRef = useRef<HTMLDivElement>(null);
   const companiesRef = useRef<HTMLDivElement>(null);
   const learningRef = useRef<HTMLDivElement>(null);
   const briefRef = useRef<HTMLDivElement>(null);
 
-  // Feed fetching
+  // Countdown timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => (prev <= 1 ? 300 : prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  // Feed Query
   const { data, isLoading, isError } = useQuery({
     queryKey: ["feed", effectiveMode, sort, kind, !!token],
     queryFn: () =>
@@ -47,7 +72,7 @@ export default function Home() {
         : fetchFeed(sort, kind),
   });
 
-  // Personalization signals
+  // Personalization Queries
   const { data: bookmarks } = useQuery({
     queryKey: ["bookmarks", !!token],
     queryFn: () => authApi.getBookmarks(token!),
@@ -89,6 +114,27 @@ export default function Home() {
     }
   };
 
+  // Handle Auth Modal Submission
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setAuthBusy(true);
+    try {
+      if (authMode === "login") {
+        await login(email, password);
+      } else {
+        await register(email, password);
+      }
+      setIsAuthModalOpen(false);
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : "Authentication failed");
+    } finally {
+      setAuthBusy(false);
+    }
+  };
+
   // Client-side search filtering
   const filteredArticles = data?.filter((a) => {
     const query = searchQuery.toLowerCase();
@@ -102,26 +148,26 @@ export default function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-[#040408] text-[#eef0f6] relative font-sans selection:bg-indigo-500/30 selection:text-white">
+    <div className="min-h-screen bg-[#070711] text-[#F8FAFC] relative font-sans selection:bg-[#8B5CF6]/30 selection:text-white">
       {/* Mesh Glow Background */}
-      <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-indigo-950/20 via-transparent to-transparent pointer-events-none z-0" />
-      <div className="absolute top-[20%] left-[10%] w-[30vw] h-[30vw] rounded-full bg-indigo-500/3 blur-[120px] pointer-events-none" />
-      <div className="absolute top-[50%] right-[10%] w-[30vw] h-[30vw] rounded-full bg-purple-500/3 blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-[700px] bg-gradient-to-b from-[#8B5CF6]/10 via-transparent to-transparent pointer-events-none z-0" />
+      <div className="absolute top-[15%] left-[5%] w-[40vw] h-[40vw] rounded-full bg-[#8B5CF6]/4 blur-[130px] pointer-events-none" />
+      <div className="absolute top-[40%] right-[5%] w-[35vw] h-[35vw] rounded-full bg-[#22D3EE]/3 blur-[130px] pointer-events-none" />
 
-      {/* TOP NAVBAR */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#05050a]/75 backdrop-blur-md">
+      {/* TOP STICKY NAVBAR */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#070711]/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           
           {/* Left: Brand Logo & Navigation */}
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-              <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_8px_#6366f1] animate-pulse"></span>
-              <span className="font-plus-jakarta text-lg font-bold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
-                AI PULSE
+            <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6] logo-pulse"></span>
+              <span className="font-display text-xl font-extrabold tracking-tight text-[#F8FAFC]">
+                Noviqe
               </span>
             </div>
             
-            <nav className="hidden lg:flex items-center gap-1 text-[13px] font-medium text-zinc-400">
+            <nav className="hidden xl:flex items-center gap-2 text-xs font-semibold text-[#94A3B8] tracking-wide uppercase">
               <button onClick={() => scrollTo(briefRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Daily Brief</button>
               <button onClick={() => scrollTo(feedRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">News</button>
               <button onClick={() => scrollTo(researchRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Research</button>
@@ -132,36 +178,36 @@ export default function Home() {
           </div>
 
           {/* Center: Search Bar */}
-          <div className="flex-1 max-w-md relative hidden md:block">
+          <div className="flex-1 max-w-lg relative hidden md:block">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-zinc-500">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             <input
               type="text"
-              placeholder="Search AI companies, models, papers..."
+              placeholder="Search AI news, companies, models, papers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 pl-9 pr-4 rounded-full border border-white/[0.08] bg-[#0c0c14]/60 text-sm text-white placeholder-zinc-500 outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+              className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.06] bg-[#0F101A]/80 text-sm text-white placeholder-[#94A3B8]/50 outline-none focus:border-[#8B5CF6]/50 focus:ring-1 focus:ring-[#8B5CF6]/20 transition-all"
             />
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute inset-y-0 right-3 flex items-center text-zinc-500 hover:text-white text-xs font-medium">
+              <button onClick={() => setSearchQuery("")} className="absolute inset-y-0 right-3.5 flex items-center text-zinc-500 hover:text-white text-xs font-semibold">
                 Clear
               </button>
             )}
           </div>
 
-          {/* Right: Actions & User Info */}
-          <div className="flex items-center gap-4">
-            {/* Bookmarks Toggle (quick navigation) */}
+          {/* Right: User actions */}
+          <div className="flex items-center gap-3">
+            {/* Bookmarked Filter Button */}
             {token && (
               <button
                 onClick={() => setMode(mode === "foryou" ? "discover" : "foryou")}
-                title={mode === "foryou" ? "Show all stories" : "Show personalized feed"}
-                className={`p-2 rounded-lg border transition-all ${
+                title={mode === "foryou" ? "Discover Feed" : "Personalized Feed"}
+                className={`p-2 rounded-xl border transition-all ${
                   mode === "foryou"
-                    ? "text-indigo-400 border-indigo-500/30 bg-indigo-500/10"
+                    ? "text-[#8B5CF6] border-[#8B5CF6]/30 bg-[#8B5CF6]/10"
                     : "text-zinc-400 border-white/[0.06] hover:bg-white/[0.02]"
                 }`}
               >
@@ -171,213 +217,281 @@ export default function Home() {
               </button>
             )}
 
-            {/* Notification Mock Icon */}
-            <div className="relative p-2 rounded-lg border border-white/[0.06] text-zinc-400 hover:bg-white/[0.02] cursor-pointer hidden sm:block">
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+            {/* Notification Badge Mock */}
+            <div className="relative p-2 rounded-xl border border-white/[0.06] text-zinc-400 hover:bg-white/[0.02] cursor-pointer hidden sm:block">
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#22D3EE] shadow-[0_0_4px_#22D3EE]"></span>
               <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
             </div>
 
-            {/* Profile / Login Block */}
-            <div className="pl-2 border-l border-white/[0.08] flex items-center">
-              <AuthBar />
-            </div>
+            {/* Authentication Action */}
+            {ready && (
+              user ? (
+                <div className="flex items-center gap-3.5 pl-3 border-l border-white/[0.08]">
+                  <span className="text-xs text-[#94A3B8] font-semibold hidden md:inline">
+                    {user.email.split("@")[0]}
+                  </span>
+                  <button
+                    onClick={logout}
+                    className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] text-xs font-bold text-zinc-400 hover:text-white hover:border-zinc-700 transition-all"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setAuthMode("login");
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="px-4.5 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7c4dff] text-xs font-bold text-white transition-all hover:scale-[1.02] shadow-lg shadow-[#8B5CF6]/10"
+                >
+                  Sign In
+                </button>
+              )
+            )}
           </div>
 
         </div>
       </header>
 
-      {/* MAIN CONTAINER */}
+      {/* NOVIQE CONTAINER */}
       <main className="max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col gap-16 md:gap-24 relative z-10">
         
         {/* HERO SECTION */}
-        <section ref={briefRef} className="flex flex-col lg:flex-row items-stretch gap-10 md:gap-12 animate-fade-in">
-          {/* Hero Left: Title and Prompt */}
+        <section ref={briefRef} className="flex flex-col lg:flex-row items-stretch gap-10 md:gap-14 animate-fade-in">
+          
+          {/* Hero Left: Message & Actions */}
           <div className="flex-1 flex flex-col justify-center">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-400 mb-3 bg-indigo-500/10 px-3 py-1 rounded-full w-max">
-              Executive Briefing
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#22D3EE] mb-4 bg-[#22D3EE]/10 px-3.5 py-1 rounded-full w-max">
+              Understand what matters in AI—in 5 minutes
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-plus-jakarta font-extrabold tracking-tight text-white mb-4">
+            <h1 className="text-4xl md:text-5xl lg:text-6.5xl font-display font-extrabold tracking-tight text-white mb-4 leading-[1.1]">
               Good Morning 👋
             </h1>
-            <p className="text-lg md:text-xl text-zinc-400 font-light mb-8 max-w-lg leading-relaxed">
-              Understand today's AI landscape and key actions in under 5 minutes.
+            <p className="text-lg md:text-xl text-[#F8FAFC] font-light mb-4">
+              Understand today's AI landscape in under 5 minutes.
+            </p>
+            <p className="text-sm text-[#94A3B8] font-normal leading-relaxed mb-8 max-w-lg">
+              The fastest way for engineers, founders and AI professionals to understand what happened, why it matters and what to do next.
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
               <button
                 onClick={() => scrollTo(feedRef)}
-                className="px-6 py-3 rounded-xl font-semibold bg-white text-black hover:bg-zinc-200 shadow-lg shadow-white/5 transition-all hover:scale-[1.02]"
+                className="px-6 py-3 rounded-xl font-bold bg-[#8B5CF6] hover:bg-[#7c4dff] text-white transition-all hover:scale-[1.02] shadow-lg shadow-[#8B5CF6]/20"
               >
                 Read Today's Brief
               </button>
               <button
                 onClick={() => scrollTo(feedRef)}
-                className="px-6 py-3 rounded-xl font-semibold border border-white/[0.08] bg-white/[0.02] text-zinc-300 hover:text-white hover:bg-white/[0.05] transition-all"
+                className="px-6 py-3 rounded-xl font-bold border border-white/[0.08] bg-white/[0.02] text-[#94A3B8] hover:text-white hover:bg-white/[0.05] transition-all"
               >
                 Explore News
               </button>
             </div>
           </div>
 
-          {/* Hero Right: Brief Metrics Summary Card */}
-          <div className="flex-1 bg-gradient-to-br from-indigo-500/[0.04] to-purple-500/[0.04] border border-white/[0.06] rounded-3xl p-6 md:p-8 backdrop-blur-md relative overflow-hidden flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl" />
+          {/* Hero Right: Today's AI Brief Card */}
+          <div className="flex-1 bg-[#0F101A] border border-white/[0.06] rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_24px_55px_rgba(0,0,0,0.4)]">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#8B5CF6]/5 rounded-full blur-3xl pointer-events-none" />
             
-            <div className="mb-6">
-              <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>
-                Today's AI Brief
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-base font-bold tracking-tight text-[#F8FAFC] flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#34D399] shadow-[0_0_8px_#34D399] animate-pulse"></span>
+                Today's AI Brief Card
               </h2>
-              <p className="text-xs text-zinc-500 mt-1">July 5, 2026 · Automated Aggregator</p>
+              <span className="text-[10px] font-bold text-[#94A3B8] bg-white/[0.03] border border-white/[0.05] px-2 py-0.5 rounded">LIVE INDICATOR</span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-[#0e0e16]/60 border border-white/[0.04] p-4 rounded-2xl hover:border-indigo-500/20 transition-all group">
-                <span className="block text-2xl font-bold font-plus-jakarta text-white group-hover:text-indigo-400 transition-colors">6</span>
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mt-0.5 block">Important Updates</span>
-              </div>
-              <div className="bg-[#0e0e16]/60 border border-white/[0.04] p-4 rounded-2xl hover:border-indigo-500/20 transition-all group">
-                <span className="block text-2xl font-bold font-plus-jakarta text-white group-hover:text-indigo-400 transition-colors">2</span>
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mt-0.5 block">Model Releases</span>
-              </div>
-              <div className="bg-[#0e0e16]/60 border border-white/[0.04] p-4 rounded-2xl hover:border-indigo-500/20 transition-all group">
-                <span className="block text-2xl font-bold font-plus-jakarta text-white group-hover:text-indigo-400 transition-colors">1</span>
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mt-0.5 block">Breakthrough</span>
-              </div>
-              <div className="bg-[#0e0e16]/60 border border-white/[0.04] p-4 rounded-2xl hover:border-indigo-500/20 transition-all group">
-                <span className="block text-2xl font-bold font-plus-jakarta text-white group-hover:text-indigo-400 transition-colors">3</span>
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mt-0.5 block">Funding Rounds</span>
-              </div>
-              <div className="bg-[#0e0e16]/60 border border-white/[0.04] p-4 rounded-2xl hover:border-indigo-500/20 transition-all group">
-                <span className="block text-2xl font-bold font-plus-jakarta text-white group-hover:text-indigo-400 transition-colors">4</span>
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mt-0.5 block">OS Launches</span>
-              </div>
-              <div className="bg-[#0e0e16]/60 border border-white/[0.04] p-4 rounded-2xl hover:border-indigo-500/20 transition-all group">
-                <span className="block text-2xl font-bold font-plus-jakarta text-emerald-400">92%</span>
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mt-0.5 block">Trend Momentum</span>
+            {/* List of briefs */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 mb-6">
+              {[
+                { count: "6", label: "Important Updates" },
+                { count: "2", label: "Model Releases" },
+                { count: "1", label: "Breakthrough" },
+                { count: "3", label: "Funding Rounds" },
+                { count: "4", label: "Open Source Launches" },
+              ].map((item, idx) => (
+                <div key={idx} className="bg-[#161A2A]/50 border border-white/[0.04] p-4 rounded-2xl transition-all hover:border-[#8B5CF6]/30">
+                  <span className="block text-2xl font-display font-extrabold text-white">{item.count}</span>
+                  <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mt-0.5 block">{item.label}</span>
+                </div>
+              ))}
+              
+              {/* Trend Momentum Block */}
+              <div className="bg-[#161A2A]/50 border border-[#8B5CF6]/20 p-4 rounded-2xl flex flex-col justify-between">
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] font-bold text-[#C084FC] uppercase tracking-wider">Momentum</span>
+                  <svg className="w-3.5 h-3.5 text-[#34D399]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22" />
+                  </svg>
+                </div>
+                <span className="text-xl font-display font-extrabold text-[#34D399] mt-1">94.8%</span>
               </div>
             </div>
 
-            <div className="text-[11px] text-zinc-500 border-t border-white/[0.05] pt-4 flex items-center justify-between">
-              <span>Next update in 4 minutes</span>
-              <span className="text-indigo-400 font-semibold cursor-pointer hover:underline" onClick={() => scrollTo(feedRef)}>Explore Details &rarr;</span>
+            {/* Countdown bar */}
+            <div className="text-[11px] text-[#94A3B8] border-t border-white/[0.05] pt-4 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5 text-[#22D3EE]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Next update in <strong className="text-white font-mono">{formatTime(secondsLeft)}</strong>
+              </span>
+              <span className="text-[#8B5CF6] font-bold cursor-pointer hover:underline" onClick={() => scrollTo(feedRef)}>Review details &rarr;</span>
             </div>
+          </div>
+        </section>
+
+        {/* SIGNATURE FEATURE: AI INSIGHT OF THE DAY */}
+        <section className="flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#94A3B8]">Signature Feature</span>
+            <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
+          </div>
+
+          <div className="bg-[#0F101A] border-2 border-[#8B5CF6]/30 rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row gap-8 shadow-[0_20px_50px_rgba(139,92,246,0.08)]">
+            {/* Background elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#8B5CF6]/3 rounded-full blur-3xl pointer-events-none" />
+            
+            {/* Left Content */}
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-xs font-extrabold uppercase tracking-widest text-[#8B5CF6] bg-[#8B5CF6]/10 px-3 py-0.5 rounded-full">
+                    AI Insight
+                  </span>
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-[#34D399] bg-[#34D399]/10 border border-[#34D399]/20 px-2.5 py-0.5 rounded-full">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]" />
+                    High Confidence
+                  </span>
+                </div>
+                
+                <h3 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-white mb-4">
+                  The Decentralization of Agent Context via MCP
+                </h3>
+                
+                <p className="text-sm md:text-base leading-relaxed text-[#94A3B8] mb-6 font-normal">
+                  The acceleration of the Model Context Protocol (MCP) marks a major shift from centralized server model calls to localized context-directed agents. Developer IDE integrations (specifically Cursor and Claude Desktop) are driving massive adoption rates. Enterprises are beginning to deploy custom MCP servers rather than custom API orchestrators.
+                </p>
+              </div>
+
+              {/* Grid detail */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 border-t border-white/[0.06] pt-5">
+                <div>
+                  <span className="text-[10px] font-bold text-[#C084FC] uppercase tracking-wider block mb-1">Why it matters</span>
+                  <p className="text-xs text-zinc-300 leading-relaxed font-semibold">
+                    This commoditizes generic API wrappers and shifts value to private context and local data connections.
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-[#22D3EE] uppercase tracking-wider block mb-1">Who it impacts</span>
+                  <p className="text-xs text-zinc-300 leading-relaxed font-semibold">
+                    Founders building wrappers lose pricing power; Engineers gain 30% speed; IT gains direct local data auditability.
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-[#34D399] uppercase tracking-wider block mb-1">Recommended Action</span>
+                  <p className="text-xs text-zinc-300 leading-relaxed font-semibold">
+                    Begin building custom private MCP servers for your internal database schemas rather than writing custom REST APIs.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Confidence Score Dial */}
+            <div className="w-full lg:w-[240px] flex flex-col items-center justify-center border-l lg:border-l border-white/[0.06] pl-0 lg:pl-8 pt-6 lg:pt-0">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 mb-4 block">Confidence Index</span>
+              
+              <div className="relative w-36 h-36 flex items-center justify-center">
+                {/* SVG circular bar */}
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" strokeWidth="6" fill="transparent" />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    stroke="#8B5CF6"
+                    strokeWidth="6"
+                    fill="transparent"
+                    strokeDasharray="263.89"
+                    strokeDashoffset="10.55" // 96% confidence
+                    strokeLinecap="round"
+                    className="transition-all duration-1000 ease-out"
+                  />
+                </svg>
+                <div className="absolute flex flex-col items-center">
+                  <span className="text-3xl font-display font-black text-white">96%</span>
+                  <span className="text-[9px] uppercase font-bold text-zinc-500 tracking-wider">Assured</span>
+                </div>
+              </div>
+
+              <span className="text-xs text-[#94A3B8] font-semibold text-center mt-4">
+                Based on cross-source validation consensus
+              </span>
+            </div>
+
           </div>
         </section>
 
         {/* SECTION 2: TRENDING TOPICS */}
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Trending Topics</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">Trending Topics</h3>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
-          <div className="flex flex-wrap gap-2.5">
+          
+          <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-2 -my-2">
             {[
-              { label: "AI Agents", trend: "+14.2%" },
-              { label: "MCP", trend: "+32.6%", highlight: true },
-              { label: "Coding Models", trend: "+8.4%" },
-              { label: "Voice AI", trend: "+12.1%" },
-              { label: "Open Source", trend: "+5.9%" },
-              { label: "Robotics", trend: "+18.7%" },
+              { icon: "🤖", label: "AI Agents", trend: "+14.2%" },
+              { icon: "⚡", label: "MCP", trend: "+32.6%", highlight: true },
+              { icon: "💻", label: "Coding Models", trend: "+8.4%" },
+              { icon: "🧠", label: "LLMs", trend: "+12.1%" },
+              { icon: "🎙", label: "Voice AI", trend: "+5.9%" },
+              { icon: "🚀", label: "Startups", trend: "+19.2%" },
+              { icon: "🦾", label: "Robotics", trend: "+11.7%" },
             ].map((topic) => (
               <button
                 key={topic.label}
                 onClick={() => setSearchQuery(topic.label)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold transition-all duration-300 hover:scale-[1.02] ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.02] ${
                   topic.highlight
-                    ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-300"
-                    : "bg-[#0b0b12] border-white/[0.05] text-zinc-300 hover:border-zinc-700 hover:text-white"
+                    ? "bg-[#8B5CF6]/10 border-[#8B5CF6]/30 text-[#C084FC]"
+                    : "bg-[#0F101A] border-white/[0.06] text-zinc-300 hover:border-zinc-700 hover:text-white"
                 }`}
               >
-                <span>🔥 {topic.label}</span>
-                <span className={`text-[10px] ${topic.highlight ? "text-indigo-400" : "text-zinc-500"}`}>{topic.trend}</span>
+                <span>{topic.icon} {topic.label}</span>
+                <span className={`text-[10px] font-semibold ${topic.highlight ? "text-[#C084FC]" : "text-zinc-500"}`}>
+                  {topic.trend}
+                </span>
               </button>
             ))}
           </div>
         </section>
 
-        {/* SECTION 3: WHAT SHOULD I DO? (COLORED BORDER INSIGHTS) */}
-        <section className="relative rounded-3xl p-0.5 overflow-hidden bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-[0_20px_50px_rgba(99,102,241,0.1)]">
-          <div className="bg-[#06060c] p-6 md:p-8 rounded-[22px] flex flex-col md:flex-row gap-8">
-            {/* Header info */}
-            <div className="md:w-1/4 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 mb-2 block">
-                  Actionable Strategy
-                </span>
-                <h3 className="text-2xl font-bold tracking-tight text-white leading-tight">
-                  What Should I Do Today?
-                </h3>
-              </div>
-              <p className="text-xs text-zinc-500 mt-2">
-                Executive actions mapped directly to high-impact developments detected in the last 24 hours.
-              </p>
-            </div>
-
-            {/* Recommendations Grid */}
-            <div className="md:w-3/4 grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="bg-white/[0.01] border border-white/[0.05] p-5 rounded-2xl hover:bg-white/[0.02] transition-colors">
-                <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest block mb-2">
-                  If you are a Data Engineer
-                </span>
-                <p className="text-sm font-medium text-white leading-snug">
-                  Integrate the newly launched Model Context Protocol (MCP) filesystem server API.
-                </p>
-                <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
-                  Allows direct context piping from legacy databases to Claude-enabled environments safely.
-                </p>
-              </div>
-
-              <div className="bg-white/[0.01] border border-white/[0.05] p-5 rounded-2xl hover:bg-white/[0.02] transition-colors">
-                <span className="text-[10px] font-bold text-purple-300 uppercase tracking-widest block mb-2">
-                  If you are a Founder
-                </span>
-                <p className="text-sm font-medium text-white leading-snug">
-                  Track Cursor IDE adoption spikes. Transition engineering licenses.
-                </p>
-                <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
-                  Teams migrating to Composer-driven flows report up to 30% speedups in shipping vertical integrations.
-                </p>
-              </div>
-
-              <div className="bg-white/[0.01] border border-white/[0.05] p-5 rounded-2xl hover:bg-white/[0.02] transition-colors">
-                <span className="text-[10px] font-bold text-pink-300 uppercase tracking-widest block mb-2">
-                  If you are an AI Engineer
-                </span>
-                <p className="text-sm font-medium text-white leading-snug">
-                  Benchmark KANs (Kolmogorov-Arnold Networks) against your standard MLPs.
-                </p>
-                <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
-                  Evaluate accuracy-to-compute ratio improvements in scientific machine learning pipelines.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 3b: TOP STORIES (REAL-TIME FEED) */}
+        {/* TOP STORIES SPLIT LAYOUT (FEED + SIDEBAR) */}
         <section ref={feedRef} className="flex flex-col lg:flex-row gap-10">
           
-          {/* Main Feed Column */}
+          {/* Main Feed Left Column */}
           <div className="flex-1 flex flex-col gap-6">
             
-            {/* Feed Header / Controllers */}
+            {/* Feed Header / Filters */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight text-white">Top Intelligence</h2>
-                <p className="text-xs text-zinc-500 mt-0.5">Scored by Impact &amp; Trend Engine</p>
+                <h2 className="text-2xl font-bold tracking-tight text-white">Top Stories</h2>
+                <p className="text-xs text-[#94A3B8] mt-0.5">Scored by Noviqe proprietary engines</p>
               </div>
 
               {/* Controls */}
               <div className="flex flex-wrap items-center gap-3">
-                {/* Mode Select */}
+                {/* Personalization Selector */}
                 {token && (
-                  <div className="bg-[#0b0b14] border border-white/[0.06] rounded-xl p-1 flex">
+                  <div className="bg-[#0F101A] border border-white/[0.06] rounded-xl p-1 flex">
                     <button
                       onClick={() => setMode("discover")}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      className={`px-3.5 py-1 rounded-lg text-xs font-bold transition-all ${
                         effectiveMode === "discover" ? "bg-white/10 text-white" : "text-zinc-400 hover:text-zinc-300"
                       }`}
                     >
@@ -385,7 +499,7 @@ export default function Home() {
                     </button>
                     <button
                       onClick={() => setMode("foryou")}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      className={`px-3.5 py-1 rounded-lg text-xs font-bold transition-all ${
                         effectiveMode === "foryou" ? "bg-white/10 text-white" : "text-zinc-400 hover:text-zinc-300"
                       }`}
                     >
@@ -394,13 +508,13 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Sort controller */}
-                <div className="bg-[#0b0b14] border border-white/[0.06] rounded-xl p-1 flex">
+                {/* Sort selector */}
+                <div className="bg-[#0F101A] border border-white/[0.06] rounded-xl p-1 flex">
                   {SORTS.map((s) => (
                     <button
                       key={s.key}
                       onClick={() => setSort(s.key)}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      className={`px-3.5 py-1 rounded-lg text-xs font-bold transition-all ${
                         sort === s.key ? "bg-white/10 text-white" : "text-zinc-400 hover:text-zinc-300"
                       }`}
                     >
@@ -411,13 +525,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Kind Filter Buttons */}
+            {/* Kind Pill Selectors */}
             <div className="flex items-center gap-2">
               {KINDS.map((k) => (
                 <button
                   key={k.key}
                   onClick={() => setKind(k.key)}
-                  className={`rounded-lg border px-3 py-1 text-xs font-semibold transition-all ${
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition-all ${
                     kind === k.key
                       ? "border-zinc-400 bg-white/[0.04] text-white"
                       : "border-white/[0.05] text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
@@ -428,17 +542,17 @@ export default function Home() {
               ))}
               {searchQuery && (
                 <span className="ml-auto text-xs text-zinc-400 flex items-center gap-2">
-                  Filtering for: <strong className="text-indigo-400">"{searchQuery}"</strong>
+                  Query: <strong className="text-[#C084FC]">"{searchQuery}"</strong>
                   <button onClick={() => setSearchQuery("")} className="text-zinc-500 hover:text-white font-bold">&times;</button>
                 </span>
               )}
             </div>
 
             {/* Articles List */}
-            {isLoading && <p className="text-zinc-500 text-sm">Loading feed...</p>}
+            {isLoading && <p className="text-zinc-500 text-sm">Synchronizing intelligence feed...</p>}
             {isError && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm">
-                Could not connect to the API. Make sure the backend service is running and seeded.
+                Noviqe Engine connection failure. Verify the API container is running and seeded.
               </div>
             )}
 
@@ -456,38 +570,92 @@ export default function Home() {
               ))}
 
               {filteredArticles?.length === 0 && (
-                <div className="bg-[#0b0b14] border border-white/[0.05] p-8 rounded-2xl text-center text-zinc-500 text-sm">
-                  No matching briefings found. Try resetting filters or adding more stories.
+                <div className="bg-[#0F101A] border border-white/[0.06] p-10 rounded-3xl text-center text-[#94A3B8] text-sm">
+                  No briefings match your current active filters.
                 </div>
               )}
             </div>
 
           </div>
 
-          {/* Sidebar Area (Bloomberg Terminal minimalist feed) */}
+          {/* Right Sidebar Column */}
           <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
-            <div className="bg-[#0c0c14]/40 border border-white/[0.05] rounded-2xl p-6 backdrop-blur-md sticky top-24">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-zinc-400 mb-4 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                Bloomberg Style Terminal Feed
+            
+            {/* Sidebar Block 1: Trending Now */}
+            <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-6 shadow-md">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]" />
+                Trending Now
               </h4>
-              <div className="flex flex-col gap-4 text-xs">
+              <div className="flex flex-col gap-4 text-xs font-normal">
                 {[
-                  { time: "20:12", source: "HN", text: "Cursor Composer mode usage doubles in tech sector surveys.", momentum: "High" },
-                  { time: "19:45", source: "arXiv", text: "New transformer efficiency model reduces inference cost by 20%.", momentum: "Med" },
-                  { time: "18:22", source: "Reddit", text: "OpenAI signs data partnerships with three major textbook creators.", momentum: "High" },
-                  { time: "17:05", source: "Reuters", text: "Anthropic CEO talks compute scaling limitations at closed meeting.", momentum: "Low" },
+                  { title: "OpenAI releases new voice capabilities for local applications.", velocity: "+22.4%" },
+                  { title: "Meta leaks Llama 4 roadmap highlighting massive context window bounds.", velocity: "+18.1%" },
+                  { title: "Standardizing MCP integrations receives support from tech leaders.", velocity: "+34.9%" },
+                  { title: "Startup funding index spikes in robotics and physical automation.", velocity: "+12.2%" },
                 ].map((item, idx) => (
                   <div key={idx} className="border-b border-white/[0.04] pb-3 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-1">
-                      <span>[{item.time}] {item.source}</span>
-                      <span className={item.momentum === "High" ? "text-indigo-400 font-bold" : "text-zinc-600"}>{item.momentum}</span>
+                    <p className="text-zinc-300 font-semibold leading-relaxed hover:text-[#C084FC] cursor-pointer" onClick={() => setSearchQuery(item.title.substring(0, 10))}>
+                      {item.title}
+                    </p>
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-1">
+                      <span>Ref #{idx + 104}</span>
+                      <span className="text-[#34D399] font-bold">{item.velocity}</span>
                     </div>
-                    <p className="text-zinc-300 font-medium leading-relaxed">{item.text}</p>
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* Sidebar Block 2: Top Contributors */}
+            <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-6 shadow-md">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE]" />
+                Top Contributors
+              </h4>
+              <div className="flex flex-col gap-3">
+                {[
+                  { name: "Hacker News Aggregator", articles: "24 articles today" },
+                  { name: "arXiv Computer Science", articles: "18 papers today" },
+                  { name: "Reddit AI Researchers", articles: "12 briefs today" },
+                ].map((contrib, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs">
+                    <div>
+                      <span className="block font-bold text-zinc-200">{contrib.name}</span>
+                      <span className="text-[10px] text-zinc-500 mt-0.5 block">{contrib.articles}</span>
+                    </div>
+                    <span className="text-[#8B5CF6] text-[10px] font-bold">Active</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Sidebar Block 3: Quick Links */}
+            <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-6 shadow-md">
+              <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]" />
+                Quick Links
+              </h4>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {[
+                  { name: "GitHub Trending", url: "https://github.com/trending" },
+                  { name: "Product Hunt", url: "https://producthunt.com" },
+                  { name: "Hugging Face", url: "https://huggingface.co" },
+                  { name: "arXiv Research", url: "https://arxiv.org" },
+                ].map((link, idx) => (
+                  <a
+                    key={idx}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 bg-[#161A2A]/40 hover:bg-[#161A2A]/80 border border-white/[0.04] hover:border-[#8B5CF6]/30 rounded-xl font-semibold text-center text-zinc-300 hover:text-white transition-all"
+                  >
+                    {link.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+
           </div>
 
         </section>
@@ -496,8 +664,8 @@ export default function Home() {
         <section ref={researchRef} className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block mb-1">Academic Contributions</span>
-              <h2 className="text-3xl font-bold tracking-tight text-white">Research Worth Reading</h2>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#8B5CF6] block mb-1">Academic Contributions</span>
+              <h2 className="text-3xl font-plus-jakarta font-extrabold tracking-tight text-white">Research Worth Reading</h2>
             </div>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-6"></div>
           </div>
@@ -509,6 +677,7 @@ export default function Home() {
                 explanation: "An alternative to Multi-Layer Perceptrons (MLPs). Uses spline-based activation functions on edges rather than nodes, improving interpretability.",
                 citations: "1,240 citations",
                 impact: "High — Potential successor to standard MLP layers in sci-ML.",
+                confidence: "98% Confidence",
                 url: "https://arxiv.org/abs/2404.19756"
               },
               {
@@ -516,6 +685,7 @@ export default function Home() {
                 explanation: "Anthropic's open-source architecture connecting AI agents to environments. Standardizes data query formatting to streamline workflows.",
                 citations: "128 citations",
                 impact: "Critical — The backbone of developer workbench orchestration.",
+                confidence: "96% Confidence",
                 url: "https://github.com/modelcontextprotocol"
               },
               {
@@ -523,26 +693,27 @@ export default function Home() {
                 explanation: "The foundational paper replacing sequential architectures (RNNs) with self-attention networks, forming the basis of modern generative models.",
                 citations: "112,490 citations",
                 impact: "Revolutionary — Groundwork for all modern generative Large Language Models.",
+                confidence: "100% Confidence",
                 url: "https://arxiv.org/abs/1706.03762"
               }
             ].map((paper, idx) => (
-              <div key={idx} className="bg-[#0a0a12]/50 border border-white/[0.05] p-6 rounded-2xl hover:border-indigo-500/20 transition-all flex flex-col justify-between group">
+              <div key={idx} className="bg-[#0F101A] border border-white/[0.06] p-6 rounded-3xl hover:border-[#8B5CF6]/30 transition-all flex flex-col justify-between group">
                 <div>
-                  <div className="flex items-center justify-between text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-3">
-                    <span>Paper {idx + 1}</span>
-                    <span className="text-zinc-500">{paper.citations}</span>
+                  <div className="flex items-center justify-between text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-4">
+                    <span>{paper.confidence}</span>
+                    <span className="text-zinc-500 font-semibold">{paper.citations}</span>
                   </div>
-                  <h4 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors leading-snug">{paper.title}</h4>
-                  <p className="text-xs text-zinc-400 leading-relaxed mb-4">{paper.explanation}</p>
+                  <h4 className="text-lg font-display font-extrabold text-white mb-2 group-hover:text-[#C084FC] transition-colors leading-snug">{paper.title}</h4>
+                  <p className="text-xs text-[#94A3B8] leading-relaxed mb-4">{paper.explanation}</p>
                 </div>
                 <div className="border-t border-white/[0.04] pt-4 mt-auto">
-                  <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">Industry Impact:</div>
+                  <div className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1.5">Industry Impact:</div>
                   <div className="text-xs text-zinc-300 font-semibold mb-4 leading-relaxed">{paper.impact}</div>
                   <a
                     href={paper.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full text-center py-2 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-indigo-500/30 rounded-lg text-xs font-bold text-zinc-300 hover:text-white transition-all block"
+                    className="w-full text-center py-2 bg-[#161A2A]/40 hover:bg-[#161A2A]/80 border border-white/[0.04] hover:border-[#8B5CF6]/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all block"
                   >
                     Read Paper &rarr;
                   </a>
@@ -556,38 +727,41 @@ export default function Home() {
         <section ref={companiesRef} className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block mb-1">Corporate Index</span>
-              <h2 className="text-3xl font-bold tracking-tight text-white">Companies to Watch</h2>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#22D3EE] block mb-1">Corporate Tracker</span>
+              <h2 className="text-3xl font-plus-jakarta font-extrabold tracking-tight text-white">Companies to Watch</h2>
             </div>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-6"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: "OpenAI", momentum: "9.8/10", hiring: "52 roles", launch: "GPT-4o voice streams", trend: "Bullish" },
-              { name: "Anthropic", momentum: "9.9/10", hiring: "34 roles", launch: "Claude 3.5 Sonnet & MCP", trend: "Bullish" },
-              { name: "Google DeepMind", momentum: "9.4/10", hiring: "88 roles", launch: "AlphaFold 3 open release", trend: "Upward" },
-              { name: "Cursor", momentum: "9.7/10", hiring: "12 roles", launch: "Composer tab & Agent loops", trend: "Surging" },
-              { name: "Perplexity", momentum: "9.2/10", hiring: "20 roles", launch: "Pro Search deep answers", trend: "Bullish" },
-              { name: "Meta AI", momentum: "9.5/10", hiring: "41 roles", launch: "Llama 3.1 405B base weight", trend: "Steady" },
+              { name: "OpenAI", momentum: "9.8/10", launch: "GPT-4o realtime API", hiring: "Accelerating", funding: "$6.6B raised", news: "Signed key news partnerships" },
+              { name: "Anthropic", momentum: "9.9/10", launch: "Claude 3.5 Sonnet & MCP", hiring: "High demand", funding: "$4B from Amazon", news: "Leading developer protocol standard" },
+              { name: "Google DeepMind", momentum: "9.4/10", launch: "AlphaFold 3 code release", hiring: "Selective", funding: "Internal Alphabet", news: "Focusing on science & biology integrations" },
+              { name: "Meta AI", momentum: "9.5/10", launch: "Llama 3.1 405B base", hiring: "Steady", funding: "Internal Meta", news: "Committed to open source releases" },
+              { name: "Mistral", momentum: "8.9/10", launch: "Codestral 22B coder", hiring: "Moderate", funding: "$640M raised", news: "Strengthening EU partnerships" },
+              { name: "Cursor", momentum: "9.7/10", launch: "Composer tab & loops", hiring: "Rapid", funding: "$30M Series A", news: "Surpassing traditional editor shares" },
             ].map((company) => (
               <div
                 key={company.name}
-                className="bg-[#08080f]/40 border border-white/[0.05] p-5 rounded-2xl hover:border-indigo-500/20 hover:bg-[#0c0c14] transition-all flex items-center justify-between group"
+                className="bg-[#0F101A] border border-white/[0.06] p-5 rounded-3xl hover:border-[#8B5CF6]/30 hover:bg-[#0F101A]/80 transition-all flex flex-col justify-between gap-4 group"
               >
-                <div>
-                  <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">{company.name}</h4>
-                  <div className="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-500">
-                    <span>⚡ Momentum: {company.momentum}</span>
-                    <span>·</span>
-                    <span>💼 {company.hiring}</span>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-white group-hover:text-[#C084FC] transition-colors">{company.name}</h4>
+                    <div className="flex items-center gap-1.5 mt-1 text-[10px] text-zinc-500 font-semibold">
+                      <span>⚡ Momentum: {company.momentum}</span>
+                      <span>·</span>
+                      <span>💼 Hiring: {company.hiring}</span>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-zinc-400 mt-1 leading-snug">Recent: {company.launch}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block bg-indigo-500/10 px-2 py-0.5 rounded-full">
-                    {company.trend}
+                  <span className="text-[9px] font-extrabold text-[#22D3EE] bg-[#22D3EE]/10 border border-[#22D3EE]/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    {company.funding}
                   </span>
+                </div>
+                <div className="border-t border-white/[0.04] pt-3 text-[11px]">
+                  <span className="text-zinc-500 block">Latest: <strong className="text-zinc-300 font-medium">{company.launch}</strong></span>
+                  <span className="text-zinc-500 block mt-0.5">News: <strong className="text-zinc-400 font-normal">{company.news}</strong></span>
                 </div>
               </div>
             ))}
@@ -597,19 +771,25 @@ export default function Home() {
         {/* SECTION 6: TODAY'S LEARNING */}
         <section ref={learningRef} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           
-          {/* Left: Featured learning card */}
-          <div className="bg-[#0b0b14]/50 border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-indigo-500/20 transition-all relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl" />
+          {/* Featured learning card */}
+          <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-7 md:p-8 flex flex-col justify-between hover:border-[#8B5CF6]/30 transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#8B5CF6]/4 rounded-full blur-xl pointer-events-none" />
             
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block mb-2">Featured Education</span>
-              <h3 className="text-2xl font-bold tracking-tight text-white mb-3">What is MCP?</h3>
-              <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#8B5CF6] bg-[#8B5CF6]/10 px-3.5 py-0.5 rounded-full">
+                  Education Hub
+                </span>
+                <span className="text-[10px] text-zinc-500 font-semibold">5 Minutes Reading</span>
+              </div>
+              
+              <h3 className="text-2xl font-display font-extrabold text-white mb-3">What is MCP?</h3>
+              <p className="text-sm text-[#94A3B8] leading-relaxed mb-4">
                 Model Context Protocol (MCP) is an open standard designed to solve the context connectivity problem for LLMs. Instead of writing custom integration scripts for every database and API, MCP provides a unified API interface.
               </p>
               
-              <div className="bg-indigo-500/[0.03] border-l-2 border-indigo-400 px-4 py-3 rounded-r-xl mb-6">
-                <span className="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-0.5">Why it matters:</span>
+              <div className="bg-[#8B5CF6]/[0.02] border-l-2 border-[#8B5CF6] px-4.5 py-3.5 rounded-r-2xl mb-6">
+                <span className="block text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-0.5">Why it matters:</span>
                 <p className="text-xs text-zinc-300 leading-relaxed font-semibold">
                   It allows LLMs and IDE workspace agents (like Cursor, Claude Desktop) to safely query and edit files directly in local sandboxes without breaking container trust structures.
                 </p>
@@ -617,48 +797,48 @@ export default function Home() {
             </div>
 
             <button
-              onClick={() => alert("Redirecting to the 5-Minute MCP Explanation module...")}
-              className="py-2.5 px-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] hover:border-indigo-500/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all text-center"
+              onClick={() => alert("Loading Novique Learning Lesson: Introduction to MCP...")}
+              className="py-2.5 px-4 bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] hover:border-[#8B5CF6]/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all text-center"
             >
-              Start 5-Minute Lesson
+              Read Lesson
             </button>
           </div>
 
-          {/* SECTION 7: WEEKLY INTELLIGENCE (REPORT CARD) */}
-          <div className="bg-gradient-to-br from-indigo-950/10 via-[#0a0a12]/80 to-purple-950/10 border border-white/[0.06] rounded-3xl p-6 md:p-8 flex flex-col justify-between hover:border-indigo-500/20 transition-all shadow-xl">
+          {/* WEEKLY INTELLIGENCE REPORT */}
+          <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-7 md:p-8 flex flex-col justify-between hover:border-[#8B5CF6]/30 transition-all shadow-xl">
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block mb-2">Weekly Synthesis</span>
-              <h3 className="text-2xl font-bold tracking-tight text-white mb-5">Weekly Intelligence</h3>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#22D3EE] block mb-2">Weekly Synthesis</span>
+              <h3 className="text-2xl font-display font-extrabold text-white mb-5">Weekly Intelligence</h3>
               
               <div className="flex flex-col gap-3.5 mb-6 text-xs text-zinc-300">
                 <div className="flex justify-between border-b border-white/[0.04] pb-2">
                   <span className="text-zinc-500 font-medium">Top Company</span>
-                  <span className="font-semibold text-white">Anthropic</span>
+                  <span className="font-semibold text-[#C084FC]">Anthropic</span>
                 </div>
                 <div className="flex justify-between border-b border-white/[0.04] pb-2">
-                  <span className="text-zinc-500 font-medium">Top Research Paper</span>
+                  <span className="text-zinc-500 font-medium">Top Paper</span>
                   <span className="font-semibold text-white">KAN (Kolmogorov-Arnold Networks)</span>
                 </div>
                 <div className="flex justify-between border-b border-white/[0.04] pb-2">
-                  <span className="text-zinc-500 font-medium">Top Rising Startup</span>
+                  <span className="text-zinc-500 font-medium">Top Startup</span>
                   <span className="font-semibold text-white">Cursor (Anysphere)</span>
                 </div>
                 <div className="flex justify-between border-b border-white/[0.04] pb-2">
-                  <span className="text-zinc-500 font-medium">Fastest Growing Developer Skill</span>
-                  <span className="font-semibold text-white">MCP Integration Development</span>
+                  <span className="text-zinc-500 font-medium">Fastest Growing Skill</span>
+                  <span className="font-semibold text-[#22D3EE]">MCP Integrations</span>
                 </div>
                 <div className="flex justify-between pb-2">
-                  <span className="text-zinc-500 font-medium">Biggest Funding Round</span>
-                  <span className="font-semibold text-emerald-400">xAI ($6B Series B)</span>
+                  <span className="text-zinc-500 font-medium">Biggest Funding</span>
+                  <span className="font-semibold text-[#34D399]">xAI ($6B Series B)</span>
                 </div>
               </div>
             </div>
 
             <button
-              onClick={() => alert("Downloading Weekly Intelligence PDF Executive Summary...")}
-              className="py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all text-center shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/30"
+              onClick={() => alert("Downloading Weekly Executive PDF...")}
+              className="py-2.5 px-4 bg-[#8B5CF6] hover:bg-[#7c4dff] text-white rounded-xl text-xs font-bold transition-all text-center shadow-lg shadow-[#8B5CF6]/10"
             >
-              Download PDF Executive Summary
+              Download Report
             </button>
           </div>
 
@@ -667,18 +847,114 @@ export default function Home() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/[0.06] py-8 mt-16 bg-[#040408]">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+      <footer className="border-t border-white/[0.06] py-10 mt-16 bg-[#070711]">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#94A3B8]">
+          <div className="flex gap-4">
+            <span className="hover:text-white cursor-pointer transition-colors">About</span>
+            <span className="hover:text-white cursor-pointer transition-colors">API</span>
+            <span className="hover:text-white cursor-pointer transition-colors">Blog</span>
+            <span className="hover:text-white cursor-pointer transition-colors">Privacy</span>
+            <span className="hover:text-white cursor-pointer transition-colors">Contact</span>
+          </div>
           <div>
-            &copy; 2026 AI Pulse. Scored and summarized under the proprietary AI Pulse Engine.
+            &copy; 2026 Novique. Scored and aggregated by the Novique AI platform.
           </div>
           <div className="flex gap-4">
-            <span className="hover:text-white cursor-pointer transition-colors">Privacy Statement</span>
-            <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
-            <span className="hover:text-white cursor-pointer transition-colors">API Endpoint Documentation</span>
+            <span className="hover:text-white cursor-pointer transition-colors">Twitter</span>
+            <span className="hover:text-white cursor-pointer transition-colors">GitHub</span>
           </div>
         </div>
       </footer>
+
+      {/* AUTHENTICATION MODAL */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-md bg-[#0F101A] border border-white/[0.08] rounded-3xl p-8 shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setIsAuthModalOpen(false);
+                setAuthError(null);
+              }}
+              className="absolute top-4 right-4 p-2 text-zinc-500 hover:text-white transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Logo */}
+            <div className="flex items-center gap-2 mb-6">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#8B5CF6]"></span>
+              <span className="font-display text-lg font-bold text-white">Noviqe Auth</span>
+            </div>
+
+            <h3 className="text-xl font-bold tracking-tight text-white mb-2">
+              {authMode === "login" ? "Welcome back" : "Create your account"}
+            </h3>
+            <p className="text-xs text-[#94A3B8] mb-6">
+              Access personalized briefings, bookmarks, and interest filters.
+            </p>
+
+            <form onSubmit={handleAuthSubmit} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1.5">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white placeholder-zinc-500 outline-none focus:border-[#8B5CF6]/50 focus:ring-1 focus:ring-[#8B5CF6]/20 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1.5">Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  placeholder="Minimum 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full h-10 px-4 rounded-xl border border-white/[0.06] bg-white/[0.02] text-sm text-white placeholder-zinc-500 outline-none focus:border-[#8B5CF6]/50 focus:ring-1 focus:ring-[#8B5CF6]/20 transition-all"
+                />
+              </div>
+
+              {authError && (
+                <div className="text-xs text-[#F43F5E] bg-[#F43F5E]/10 border border-[#F43F5E]/20 p-2.5 rounded-lg">
+                  {authError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={authBusy}
+                className="w-full h-10 mt-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7c4dff] text-xs font-bold text-white transition-all disabled:opacity-50"
+              >
+                {authBusy ? "Verifying..." : authMode === "login" ? "Sign In" : "Create Account"}
+              </button>
+            </form>
+
+            <div className="mt-5 text-center text-xs">
+              <span className="text-zinc-500">
+                {authMode === "login" ? "Don't have an account?" : "Already have an account?"}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode(authMode === "login" ? "register" : "login");
+                  setAuthError(null);
+                }}
+                className="ml-1 text-[#8B5CF6] font-bold hover:underline"
+              >
+                {authMode === "login" ? "Register" : "Sign In"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -8,14 +8,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Dark-mode-first palette
-        ink: "#0a0a0f",
-        panel: "#13131a",
-        edge: "#23232e",
-        muted: "#8b8b9a",
-        accent: "#6366f1",
-        positive: "#22c55e",
-        negative: "#ef4444",
+        ink: "#070711",
+        panel: "#0F101A",
+        panelSecondary: "#161A2A",
+        edge: "rgba(255,255,255,0.06)",
+        muted: "#94A3B8",
+        accent: "#8B5CF6",
+        cyanAccent: "#22D3EE",
+        positive: "#34D399",
+        warning: "#F59E0B",
+        negative: "#F43F5E",
+        textPrimary: "#F8FAFC",
+        textSecondary: "#94A3B8",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-plus-jakarta)", "sans-serif"],
       },
     },
   },

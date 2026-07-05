@@ -9,42 +9,42 @@ function timeAgo(iso: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
-// Generate high-quality, role-specific insights dynamically from article topics & text
-function getActionableInsights(article: Article) {
+// Tailored Noviqe role-specific recommended actions
+function getRecommendedActions(article: Article) {
   const topics = (article.topics ?? []).map((t) => t.toLowerCase());
   const title = article.title.toLowerCase();
 
-  let dev = "Evaluate integration points for this technology in your current dev stack.";
-  let founder = "Assess if this shifts the competitive dynamics in your market segment.";
-  let investor = "Monitor adoption rate of this technology to evaluate funding readiness.";
+  let engineer = "Analyze code repositories or documentation for implementation patterns of this technology.";
+  let founder = "Look at integration opportunities to enhance user workflows and team productivity.";
+  let researcher = "Track how this theoretical contribution or tool performs under standard benchmarks.";
 
   if (topics.some((t) => t.includes("agent") || t.includes("mcp"))) {
-    dev = "Build a custom MCP server to hook your internal databases and APIs into Claude or Cursor.";
-    founder = "Design agentic workflows to automate high-friction operational tasks in your startup.";
-    investor = "Back infrastructure startups enabling secure, interoperable agent-to-agent transactions.";
+    engineer = "Build a custom MCP server to securely expose local databases or dev environments to Cursor/Claude.";
+    founder = "Identify business workflows where autonomous agents can eliminate high-friction manual data entry.";
+    researcher = "Study tool-calling architectures and planning mechanisms to reduce recursive loop hallucination.";
   } else if (topics.some((t) => t.includes("model") || t.includes("llm") || t.includes("open source"))) {
-    dev = "Benchmark this model locally to see if it can replace expensive cloud API calls.";
-    founder = "Evaluate if this open model allows you to offer cheaper, faster user features.";
-    investor = "Review if the commoditization of models impacts the pricing power of your portfolio.";
+    engineer = "Benchmark local inference models against hosted cloud APIs. Test performance in GGUF/llama.cpp format.";
+    founder = "Evaluate replacing premium proprietary APIs with fine-tuned open-source alternatives to increase margins.";
+    researcher = "Compare the architecture alterations (activation functions, attention heads) against base models.";
   } else if (topics.some((t) => t.includes("funding") || t.includes("startup") || t.includes("acquisition"))) {
-    dev = "Analyze their engineering stack and architecture to learn how they scaled.";
-    founder = "Examine their pricing tiers and messaging to capture underserved customer cohorts.";
-    investor = "Examine the round size and valuation multiples to benchmark target deals.";
+    engineer = "Analyze their technical stack, API latency, and scale challenges; monitor hiring portals.";
+    founder = "Examine their product differentiation and pricing strategy to target gaps in their offerings.";
+    researcher = "Identify commercial applications of theoretical frameworks driving venture funding.";
   } else if (topics.some((t) => t.includes("robotics") || t.includes("hardware"))) {
-    dev = "Check open simulation platforms like Isaac Sim to write control logic for this hardware.";
-    founder = "Identify manual logistical or sorting bottlenecks that can leverage this automation.";
-    investor = "Invest in the software control layer which holds higher margins than raw hardware.";
+    engineer = "Explore ROS2, Isaac Sim, and web controllers for interfacing hardware pipelines with remote agents.";
+    founder = "Evaluate automating physical warehousing, packaging, or manual tasks using vision-guided robots.";
+    researcher = "Analyze vision-language-action (VLA) models and their transfer learning limits in real-world environments.";
   } else if (topics.some((t) => t.includes("voice") || t.includes("audio") || t.includes("speech"))) {
-    dev = "Integrate low-latency WebSocket audio streams to design highly responsive voice nodes.";
-    founder = "Introduce next-gen voice interfaces to lower bounce rates on your landing page.";
-    investor = "Track emerging demand for voice watermarking and anti-deepfake security products.";
+    engineer = "Implement low-latency WebSocket connections for real-time speech-to-speech pipelines.";
+    founder = "Deploy voice agents to intercept inbound leads or handle simple customer support queries.";
+    researcher = "Investigate acoustic feature extraction and watermarking to prevent voice forgery.";
   } else if (article.kind === "paper") {
-    dev = "Examine the reference implementation on GitHub; check for efficiency gains in inference.";
-    founder = "Look past the academic jargon to build a practical product wrapper around this method.";
-    investor = "Identify the research labs behind this paper to spot spin-off commercialization opportunities.";
+    engineer = "Examine the reference implementation on GitHub; check for efficiency gains in inference.";
+    founder = "Determine if this theoretical improvement can be turned into a commercial model wrapper.";
+    researcher = "Identify the university labs and researchers behind this paper for potential incubator spin-offs.";
   }
 
-  return { dev, founder, investor };
+  return { engineer, founder, researcher };
 }
 
 interface Props {
@@ -65,7 +65,7 @@ export function ArticleCard({
   onToggleFollow,
 }: Props) {
   const [copied, setCopied] = useState(false);
-  const insights = getActionableInsights(article);
+  const actions = getRecommendedActions(article);
 
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -74,26 +74,35 @@ export function ArticleCard({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Color ranges for scores
-  const getScoreColor = (score: number) => {
-    if (score >= 70) return "text-indigo-400 bg-indigo-500/10 border-indigo-500/20";
-    if (score >= 45) return "text-purple-400 bg-purple-500/10 border-purple-500/20";
-    return "text-zinc-400 bg-zinc-500/10 border-zinc-500/20";
+  // Determine category badge icon
+  const getCategoryBadge = () => {
+    const topics = (article.topics ?? []).map((t) => t.toLowerCase());
+    if (article.kind === "paper") return "📚 Research Paper";
+    if (topics.some((t) => t.includes("agent"))) return "🤖 AI Agents";
+    if (topics.some((t) => t.includes("mcp"))) return "⚡ MCP";
+    if (topics.some((t) => t.includes("model"))) return "🧠 LLMs / Models";
+    if (topics.some((t) => t.includes("robot"))) return "🦾 Robotics";
+    if (topics.some((t) => t.includes("voice") || t.includes("audio"))) return "🎙️ Voice AI";
+    if (topics.some((t) => t.includes("funding") || t.includes("startup"))) return "🚀 Startups";
+    return "💡 General AI";
   };
 
   return (
-    <article className="group relative rounded-2xl border border-white/[0.05] bg-[#0c0c14]/40 p-6 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/30 hover:bg-[#0c0c14]/80 hover:shadow-[0_12px_30px_rgba(99,102,241,0.06)]">
-      {/* Top Section: Badges & Metadata */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Source Badge */}
-          <span className="inline-flex items-center rounded-full bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 text-xs font-semibold text-zinc-300">
-            {article.kind === "paper" ? "📑 arXiv" : `🔥 ${article.source}`}
+    <article className="group relative rounded-3xl border border-white/[0.06] bg-[#0F101A] p-7 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8B5CF6]/30 hover:bg-[#0F101A]/90 hover:shadow-[0_16px_36px_rgba(139,92,246,0.06)]">
+      
+      {/* Top Header: Category, Source & Metadata */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Category Badge */}
+          <span className="inline-flex items-center rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 px-3.5 py-1 text-xs font-semibold text-[#C084FC]">
+            {getCategoryBadge()}
           </span>
-          <span className="text-xs text-zinc-500">·</span>
+          <span className="text-zinc-600">·</span>
+          <span className="text-xs font-medium text-zinc-400">{article.source}</span>
+          <span className="text-zinc-600">·</span>
           <span className="text-xs text-zinc-500">{timeAgo(article.published_at)}</span>
-          
-          {/* Topic Badges */}
+
+          {/* Topic Pills */}
           <div className="flex flex-wrap items-center gap-1.5 ml-2">
             {(article.topics ?? []).map((t) => {
               const isFollowed = followed?.has(t.toLowerCase());
@@ -102,10 +111,10 @@ export function ArticleCard({
                   <button
                     key={t}
                     onClick={() => onToggleFollow(t)}
-                    className={`rounded-full border px-2 py-0.5 text-[10px] font-medium transition-all duration-200 ${
+                    className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wide transition-all ${
                       isFollowed
-                        ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
-                        : "border-white/[0.05] bg-white/[0.02] text-zinc-400 hover:border-indigo-500/30 hover:text-zinc-300"
+                        ? "border-[#8B5CF6] bg-[#8B5CF6]/20 text-[#C084FC]"
+                        : "border-white/[0.04] bg-white/[0.02] text-zinc-400 hover:border-[#8B5CF6]/30 hover:text-zinc-300"
                     }`}
                   >
                     {isFollowed ? "✓ " : "+ "}
@@ -116,7 +125,7 @@ export function ArticleCard({
               return (
                 <span
                   key={t}
-                  className="rounded-full border border-white/[0.05] bg-white/[0.02] px-2 py-0.5 text-[10px] font-medium text-zinc-400"
+                  className="rounded-full border border-white/[0.04] bg-white/[0.02] px-2.5 py-0.5 text-[10px] font-semibold text-zinc-400 uppercase tracking-wide"
                 >
                   {t}
                 </span>
@@ -125,19 +134,19 @@ export function ArticleCard({
           </div>
         </div>
 
-        {/* Action icons */}
+        {/* Action Buttons (Bookmark & Share) */}
         <div className="flex items-center gap-1.5">
           {authed && (
             <button
               onClick={() => onToggleBookmark?.(article.id)}
-              title={bookmarked ? "Unsave Brief" : "Save Brief"}
-              className={`p-2 rounded-lg transition-colors border ${
+              title={bookmarked ? "Remove Bookmark" : "Bookmark Brief"}
+              className={`p-2 rounded-xl transition-all border ${
                 bookmarked
-                  ? "text-indigo-400 border-indigo-500/20 bg-indigo-500/5"
-                  : "text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.03]"
+                  ? "text-[#8B5CF6] border-[#8B5CF6]/30 bg-[#8B5CF6]/10"
+                  : "text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.04]"
               }`}
             >
-              <svg className="w-4 h-4" fill={bookmarked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4.5 h-4.5" fill={bookmarked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
               </svg>
             </button>
@@ -145,13 +154,13 @@ export function ArticleCard({
 
           <button
             onClick={handleShare}
-            title="Copy URL"
-            className="p-2 rounded-lg transition-colors border text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.03] flex items-center gap-1"
+            title="Share Brief URL"
+            className="p-2 rounded-xl transition-all border text-zinc-400 border-transparent hover:border-white/[0.08] hover:bg-white/[0.04] flex items-center gap-1"
           >
             {copied ? (
-              <span className="text-[10px] text-indigo-400 font-semibold px-1">Copied!</span>
+              <span className="text-[10px] text-[#22D3EE] font-bold px-1">Copied!</span>
             ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186l5.57 3.285m-5.57-3.285l5.57-3.285m0 0a2.25 2.25 0 103.935-2.186 2.25 2.25 0 00-3.935 2.186zm0-2.186L12 14.83m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186z" />
               </svg>
             )}
@@ -159,8 +168,8 @@ export function ArticleCard({
         </div>
       </div>
 
-      {/* Title */}
-      <h3 className="text-xl font-bold tracking-tight text-white mb-2.5 leading-snug group-hover:text-indigo-300 transition-colors">
+      {/* Middle: Title */}
+      <h3 className="text-xl md:text-2xl font-display font-extrabold tracking-tight text-[#F8FAFC] mb-3 leading-snug group-hover:text-[#C084FC] transition-colors">
         <a href={article.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
           {article.title}
         </a>
@@ -168,99 +177,98 @@ export function ArticleCard({
 
       {/* 30-Second Summary */}
       {article.summary_30s && (
-        <p className="text-sm leading-relaxed text-zinc-300 mb-4 font-normal">
+        <p className="text-sm md:text-base leading-relaxed text-[#94A3B8] mb-5 font-normal">
           {article.summary_30s}
         </p>
       )}
 
       {/* Why it Matters (Highlighted Container) */}
       {article.why_it_matters && (
-        <div className="bg-indigo-500/[0.03] border-l-2 border-indigo-500/80 px-4 py-3.5 rounded-r-xl mb-5">
-          <span className="block text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1">
+        <div className="bg-[#8B5CF6]/[0.03] border-l-2 border-[#8B5CF6] px-5 py-4 rounded-r-2xl mb-6">
+          <span className="block text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-1.5">
             Why it Matters
           </span>
-          <p className="text-sm leading-relaxed text-zinc-300 font-medium">
+          <p className="text-sm md:text-[15px] leading-relaxed text-[#F8FAFC] font-medium">
             {article.why_it_matters}
           </p>
         </div>
       )}
 
-      {/* Actionable Insights Grid */}
-      <div className="mt-5 border-t border-white/[0.06] pt-5">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-400">
-            Actionable Insights
+      {/* Recommended Action Grid (Visually Distinct Container) */}
+      <div className="mt-6 border-t border-white/[0.06] pt-6">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500">
+            Recommended Action
           </span>
           <div className="h-[1px] bg-white/[0.06] flex-1"></div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-          {/* Developer Insight */}
-          <div className="bg-white/[0.01] border border-white/[0.04] p-3.5 rounded-xl transition-all hover:bg-white/[0.03] hover:border-white/[0.08]">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-              <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">
-                Developers
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Software Engineer */}
+          <div className="bg-[#161A2A]/40 border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-[#161A2A]/80 hover:border-[#8B5CF6]/20">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]"></span>
+              <span className="text-[10px] font-bold text-[#C084FC] uppercase tracking-wider">
+                Software Engineers
               </span>
             </div>
-            <p className="text-xs text-zinc-400 leading-relaxed font-normal">
-              {insights.dev}
+            <p className="text-xs text-[#94A3B8] leading-relaxed font-normal">
+              {actions.engineer}
             </p>
           </div>
 
-          {/* Founder Insight */}
-          <div className="bg-white/[0.01] border border-white/[0.04] p-3.5 rounded-xl transition-all hover:bg-white/[0.03] hover:border-white/[0.08]">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-              <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider">
+          {/* Founder */}
+          <div className="bg-[#161A2A]/40 border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-[#161A2A]/80 hover:border-[#8B5CF6]/20">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE]"></span>
+              <span className="text-[10px] font-bold text-[#22D3EE] uppercase tracking-wider">
                 Founders
               </span>
             </div>
-            <p className="text-xs text-zinc-400 leading-relaxed font-normal">
-              {insights.founder}
+            <p className="text-xs text-[#94A3B8] leading-relaxed font-normal">
+              {actions.founder}
             </p>
           </div>
 
-          {/* Investor Insight */}
-          <div className="bg-white/[0.01] border border-white/[0.04] p-3.5 rounded-xl transition-all hover:bg-white/[0.03] hover:border-white/[0.08]">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">
-                Investors
+          {/* AI Researcher */}
+          <div className="bg-[#161A2A]/40 border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-[#161A2A]/80 hover:border-[#8B5CF6]/20">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]"></span>
+              <span className="text-[10px] font-bold text-[#34D399] uppercase tracking-wider">
+                AI Researchers
               </span>
             </div>
-            <p className="text-xs text-zinc-400 leading-relaxed font-normal">
-              {insights.investor}
+            <p className="text-xs text-[#94A3B8] leading-relaxed font-normal">
+              {actions.researcher}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Card Footer: Metrics & CTA */}
-      <div className="mt-5 pt-4 border-t border-white/[0.06] flex items-center justify-between flex-wrap gap-4">
-        {/* Scores */}
+      {/* Card Footer: Scores & Original Link */}
+      <div className="mt-6 pt-5 border-t border-white/[0.06] flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
-          {/* Impact Score */}
-          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${getScoreColor(article.impact_score)}`}>
+          {/* Impact Score Pill */}
+          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/5 text-xs font-semibold text-[#C084FC]">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
             </svg>
             <span>Impact: {article.impact_score.toFixed(0)}</span>
           </div>
 
-          {/* Trend Score */}
-          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${getScoreColor(article.trend_score)}`}>
+          {/* Trend Score Pill */}
+          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#22D3EE]/20 bg-[#22D3EE]/5 text-xs font-semibold text-[#22D3EE]">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
             </svg>
             <span>Trend: {article.trend_score.toFixed(0)}</span>
           </div>
 
-          {/* Engagement details */}
-          <span className="text-xs text-zinc-500">
+          {/* Stats fallback */}
+          <span className="text-xs text-zinc-500 font-medium">
             {article.kind === "paper"
               ? `📑 ${article.citation_count} citations`
-              : `▲ ${article.points} points · 💬 ${article.num_comments} comments`}
+              : `▲ ${article.points} · 💬 ${article.num_comments}`}
           </span>
         </div>
 
@@ -269,11 +277,11 @@ export function ArticleCard({
           href={article.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-bold text-[#8B5CF6] hover:text-[#C084FC] transition-colors"
         >
           Read Original
-          <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
           </svg>
         </a>
       </div>

@@ -77,18 +77,25 @@ export function ArticleCard({
   // Determine category badge icon
   const getCategoryBadge = () => {
     const topics = (article.topics ?? []).map((t) => t.toLowerCase());
-    if (article.kind === "paper") return "📚 Research Paper";
+    if (article.kind === "paper") return "📚 Research Intelligence";
     if (topics.some((t) => t.includes("agent"))) return "🤖 AI Agents";
-    if (topics.some((t) => t.includes("mcp"))) return "⚡ MCP";
-    if (topics.some((t) => t.includes("model"))) return "🧠 LLMs / Models";
+    if (topics.some((t) => t.includes("mcp"))) return "⚡ MCP Signals";
+    if (topics.some((t) => t.includes("model"))) return "🧠 reasoning Models";
     if (topics.some((t) => t.includes("robot"))) return "🦾 Robotics";
     if (topics.some((t) => t.includes("voice") || t.includes("audio"))) return "🎙️ Voice AI";
-    if (topics.some((t) => t.includes("funding") || t.includes("startup"))) return "🚀 Startups";
+    if (topics.some((t) => t.includes("funding") || t.includes("startup"))) return "🚀 Startups / Funding";
     return "💡 General AI";
   };
 
+  // Color ranges for scores
+  const getScoreColor = (score: number) => {
+    if (score >= 70) return "text-[#8B5CF6] bg-[#8B5CF6]/10 border-[#8B5CF6]/20";
+    if (score >= 45) return "text-[#22D3EE] bg-[#22D3EE]/10 border-[#22D3EE]/20";
+    return "text-zinc-400 bg-white/[0.03] border-white/[0.06]";
+  };
+
   return (
-    <article className="group relative rounded-3xl border border-white/[0.06] bg-[#0F101A] p-7 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8B5CF6]/30 hover:bg-[#0F101A]/90 hover:shadow-[0_16px_36px_rgba(139,92,246,0.06)]">
+    <article className="group relative rounded-3xl border border-white/[0.06] bg-[#121625] p-7 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8B5CF6]/30 hover:bg-[#121625]/90 hover:shadow-[0_16px_36px_rgba(139,92,246,0.06)]">
       
       {/* Top Header: Category, Source & Metadata */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
@@ -98,7 +105,7 @@ export function ArticleCard({
             {getCategoryBadge()}
           </span>
           <span className="text-zinc-600">·</span>
-          <span className="text-xs font-medium text-zinc-400">{article.source}</span>
+          <span className="text-xs font-semibold text-zinc-400">{article.source}</span>
           <span className="text-zinc-600">·</span>
           <span className="text-xs text-zinc-500">{timeAgo(article.published_at)}</span>
 
@@ -182,17 +189,32 @@ export function ArticleCard({
         </p>
       )}
 
-      {/* Why it Matters (Highlighted Container) */}
-      {article.why_it_matters && (
-        <div className="bg-[#8B5CF6]/[0.03] border-l-2 border-[#8B5CF6] px-5 py-4 rounded-r-2xl mb-6">
-          <span className="block text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-1.5">
-            Why it Matters
-          </span>
-          <p className="text-sm md:text-[15px] leading-relaxed text-[#F8FAFC] font-medium">
-            {article.why_it_matters}
-          </p>
-        </div>
-      )}
+      {/* Grid of Why it Matters & Who is Impacted */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* Why it Matters */}
+        {article.why_it_matters && (
+          <div className="bg-[#8B5CF6]/[0.02] border-l-2 border-[#8B5CF6] px-4 py-3.5 rounded-r-2xl">
+            <span className="block text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-1">
+              Why it Matters
+            </span>
+            <p className="text-xs md:text-sm leading-relaxed text-[#F8FAFC] font-medium">
+              {article.why_it_matters}
+            </p>
+          </div>
+        )}
+
+        {/* Who is Impacted */}
+        {article.who_is_impacted && (
+          <div className="bg-[#22D3EE]/[0.02] border-l-2 border-[#22D3EE] px-4 py-3.5 rounded-r-2xl">
+            <span className="block text-[10px] font-bold text-[#22D3EE] uppercase tracking-widest mb-1">
+              Who is Impacted
+            </span>
+            <p className="text-xs md:text-sm leading-relaxed text-[#F8FAFC] font-medium">
+              {article.who_is_impacted}
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Recommended Action Grid (Visually Distinct Container) */}
       <div className="mt-6 border-t border-white/[0.06] pt-6">
@@ -205,7 +227,7 @@ export function ArticleCard({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Software Engineer */}
-          <div className="bg-[#161A2A]/40 border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-[#161A2A]/80 hover:border-[#8B5CF6]/20">
+          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-[#8B5CF6]/20">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]"></span>
               <span className="text-[10px] font-bold text-[#C084FC] uppercase tracking-wider">
@@ -218,7 +240,7 @@ export function ArticleCard({
           </div>
 
           {/* Founder */}
-          <div className="bg-[#161A2A]/40 border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-[#161A2A]/80 hover:border-[#8B5CF6]/20">
+          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-[#8B5CF6]/20">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE]"></span>
               <span className="text-[10px] font-bold text-[#22D3EE] uppercase tracking-wider">
@@ -231,7 +253,7 @@ export function ArticleCard({
           </div>
 
           {/* AI Researcher */}
-          <div className="bg-[#161A2A]/40 border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-[#161A2A]/80 hover:border-[#8B5CF6]/20">
+          <div className="bg-white/[0.01] border border-white/[0.04] p-4 rounded-2xl transition-all hover:bg-white/[0.02] hover:border-[#8B5CF6]/20">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]"></span>
               <span className="text-[10px] font-bold text-[#34D399] uppercase tracking-wider">
@@ -249,19 +271,19 @@ export function ArticleCard({
       <div className="mt-6 pt-5 border-t border-white/[0.06] flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           {/* Impact Score Pill */}
-          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/5 text-xs font-semibold text-[#C084FC]">
+          <div className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full border text-xs font-semibold ${getScoreColor(article.impact_score)}`}>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
             </svg>
             <span>Impact: {article.impact_score.toFixed(0)}</span>
           </div>
 
-          {/* Trend Score Pill */}
-          <div className="flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#22D3EE]/20 bg-[#22D3EE]/5 text-xs font-semibold text-[#22D3EE]">
+          {/* Momentum Score Pill (formerly Trend Score) */}
+          <div className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full border text-xs font-semibold ${getScoreColor(article.trend_score)}`}>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22" />
             </svg>
-            <span>Trend: {article.trend_score.toFixed(0)}</span>
+            <span>Momentum: {article.trend_score.toFixed(0)}</span>
           </div>
 
           {/* Stats fallback */}
@@ -272,14 +294,14 @@ export function ArticleCard({
           </span>
         </div>
 
-        {/* Read Original button */}
+        {/* Read Source button */}
         <a
           href={article.url}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-xs font-bold text-[#8B5CF6] hover:text-[#C084FC] transition-colors"
         >
-          Read Original
+          Read Source
           <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
           </svg>

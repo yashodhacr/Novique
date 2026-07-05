@@ -46,6 +46,7 @@ export default function Home() {
   const feedRef = useRef<HTMLDivElement>(null);
   const researchRef = useRef<HTMLDivElement>(null);
   const companiesRef = useRef<HTMLDivElement>(null);
+  const modelsRef = useRef<HTMLDivElement>(null);
   const learningRef = useRef<HTMLDivElement>(null);
   const briefRef = useRef<HTMLDivElement>(null);
 
@@ -151,8 +152,8 @@ export default function Home() {
     <div className="min-h-screen bg-[#070711] text-[#F8FAFC] relative font-sans selection:bg-[#8B5CF6]/30 selection:text-white">
       {/* Mesh Glow Background */}
       <div className="absolute top-0 left-0 right-0 h-[700px] bg-gradient-to-b from-[#8B5CF6]/10 via-transparent to-transparent pointer-events-none z-0" />
-      <div className="absolute top-[15%] left-[5%] w-[40vw] h-[40vw] rounded-full bg-[#8B5CF6]/4 blur-[130px] pointer-events-none" />
-      <div className="absolute top-[40%] right-[5%] w-[35vw] h-[35vw] rounded-full bg-[#22D3EE]/3 blur-[130px] pointer-events-none" />
+      <div className="absolute top-[12%] left-[5%] w-[40vw] h-[40vw] rounded-full bg-[#8B5CF6]/4 blur-[130px] pointer-events-none" />
+      <div className="absolute top-[38%] right-[5%] w-[35vw] h-[35vw] rounded-full bg-[#22D3EE]/3 blur-[130px] pointer-events-none" />
 
       {/* TOP STICKY NAVBAR */}
       <header className="sticky top-0 z-50 w-full border-b border-white/[0.06] bg-[#070711]/70 backdrop-blur-xl">
@@ -168,11 +169,11 @@ export default function Home() {
             </div>
             
             <nav className="hidden xl:flex items-center gap-2 text-xs font-semibold text-[#94A3B8] tracking-wide uppercase">
-              <button onClick={() => scrollTo(briefRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Daily Brief</button>
-              <button onClick={() => scrollTo(feedRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">News</button>
+              <button onClick={() => scrollTo(briefRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Morning Brief</button>
+              <button onClick={() => scrollTo(feedRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Signals</button>
               <button onClick={() => scrollTo(researchRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Research</button>
               <button onClick={() => scrollTo(companiesRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Companies</button>
-              <button onClick={() => scrollTo(feedRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Models</button>
+              <button onClick={() => scrollTo(modelsRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Models</button>
               <button onClick={() => scrollTo(learningRef)} className="px-3 py-1.5 rounded-md hover:text-white transition-colors">Learning</button>
             </nav>
           </div>
@@ -186,10 +187,10 @@ export default function Home() {
             </div>
             <input
               type="text"
-              placeholder="Search AI news, companies, models, papers..."
+              placeholder="Search companies, models, papers, topics..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.06] bg-[#0F101A]/80 text-sm text-white placeholder-[#94A3B8]/50 outline-none focus:border-[#8B5CF6]/50 focus:ring-1 focus:ring-[#8B5CF6]/20 transition-all"
+              className="w-full h-10 pl-10 pr-4 rounded-full border border-white/[0.06] bg-[#121625]/80 text-sm text-white placeholder-[#94A3B8]/50 outline-none focus:border-[#8B5CF6]/50 focus:ring-1 focus:ring-[#8B5CF6]/20 transition-all"
             />
             {searchQuery && (
               <button onClick={() => setSearchQuery("")} className="absolute inset-y-0 right-3.5 flex items-center text-zinc-500 hover:text-white text-xs font-semibold">
@@ -265,7 +266,7 @@ export default function Home() {
           {/* Hero Left: Message & Actions */}
           <div className="flex-1 flex flex-col justify-center">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#22D3EE] mb-4 bg-[#22D3EE]/10 px-3.5 py-1 rounded-full w-max">
-              Understand what matters in AI—in 5 minutes
+              Noviqe · AI Intelligence Platform
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6.5xl font-display font-extrabold tracking-tight text-white mb-4 leading-[1.1]">
               Good Morning 👋
@@ -274,7 +275,7 @@ export default function Home() {
               Understand today's AI landscape in under 5 minutes.
             </p>
             <p className="text-sm text-[#94A3B8] font-normal leading-relaxed mb-8 max-w-lg">
-              The fastest way for engineers, founders and AI professionals to understand what happened, why it matters and what to do next.
+              The fastest way for engineers, founders, investors and AI professionals to understand what happened, why it matters and what action to take.
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -288,13 +289,13 @@ export default function Home() {
                 onClick={() => scrollTo(feedRef)}
                 className="px-6 py-3 rounded-xl font-bold border border-white/[0.08] bg-white/[0.02] text-[#94A3B8] hover:text-white hover:bg-white/[0.05] transition-all"
               >
-                Explore News
+                Explore Signals
               </button>
             </div>
           </div>
 
           {/* Hero Right: Today's AI Brief Card */}
-          <div className="flex-1 bg-[#0F101A] border border-white/[0.06] rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_24px_55px_rgba(0,0,0,0.4)]">
+          <div className="flex-1 bg-[#121625] border border-white/[0.06] rounded-3xl p-7 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_24px_55px_rgba(0,0,0,0.4)]">
             <div className="absolute top-0 right-0 w-40 h-40 bg-[#8B5CF6]/5 rounded-full blur-3xl pointer-events-none" />
             
             <div className="mb-6 flex items-center justify-between">
@@ -302,26 +303,26 @@ export default function Home() {
                 <span className="w-2 h-2 rounded-full bg-[#34D399] shadow-[0_0_8px_#34D399] animate-pulse"></span>
                 Today's AI Brief Card
               </h2>
-              <span className="text-[10px] font-bold text-[#94A3B8] bg-white/[0.03] border border-white/[0.05] px-2 py-0.5 rounded">LIVE INDICATOR</span>
+              <span className="text-[10px] font-bold text-[#94A3B8] bg-white/[0.03] border border-white/[0.05] px-2 py-0.5 rounded uppercase tracking-wider">LIVE STATUS</span>
             </div>
 
             {/* List of briefs */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 mb-6">
               {[
-                { count: "6", label: "Important Updates" },
-                { count: "2", label: "Model Releases" },
-                { count: "1", label: "Breakthrough" },
+                { count: "6", label: "Major Updates" },
+                { count: "2", label: "Model Launches" },
+                { count: "1", label: "Breakthroughs" },
                 { count: "3", label: "Funding Rounds" },
-                { count: "4", label: "Open Source Launches" },
+                { count: "4", label: "OS Launches" },
               ].map((item, idx) => (
-                <div key={idx} className="bg-[#161A2A]/50 border border-white/[0.04] p-4 rounded-2xl transition-all hover:border-[#8B5CF6]/30">
+                <div key={idx} className="bg-[#0C0F18]/50 border border-white/[0.04] p-4 rounded-2xl transition-all hover:border-[#8B5CF6]/30">
                   <span className="block text-2xl font-display font-extrabold text-white">{item.count}</span>
                   <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mt-0.5 block">{item.label}</span>
                 </div>
               ))}
               
               {/* Trend Momentum Block */}
-              <div className="bg-[#161A2A]/50 border border-[#8B5CF6]/20 p-4 rounded-2xl flex flex-col justify-between">
+              <div className="bg-[#0C0F18]/50 border border-[#8B5CF6]/20 p-4 rounded-2xl flex flex-col justify-between">
                 <div className="flex items-center gap-1">
                   <span className="text-[10px] font-bold text-[#C084FC] uppercase tracking-wider">Momentum</span>
                   <svg className="w-3.5 h-3.5 text-[#34D399]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -338,7 +339,7 @@ export default function Home() {
                 <svg className="w-3.5 h-3.5 text-[#22D3EE]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Next update in <strong className="text-white font-mono">{formatTime(secondsLeft)}</strong>
+                Next refresh in <strong className="text-white font-mono">{formatTime(secondsLeft)}</strong>
               </span>
               <span className="text-[#8B5CF6] font-bold cursor-pointer hover:underline" onClick={() => scrollTo(feedRef)}>Review details &rarr;</span>
             </div>
@@ -348,12 +349,11 @@ export default function Home() {
         {/* SIGNATURE FEATURE: AI INSIGHT OF THE DAY */}
         <section className="flex flex-col gap-5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-[#94A3B8]">Signature Feature</span>
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#94A3B8]">AI Insight of the Day</span>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
 
-          <div className="bg-[#0F101A] border-2 border-[#8B5CF6]/30 rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row gap-8 shadow-[0_20px_50px_rgba(139,92,246,0.08)]">
-            {/* Background elements */}
+          <div className="bg-[#121625] border-2 border-[#8B5CF6]/30 rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col lg:flex-row gap-8 shadow-[0_20px_50px_rgba(139,92,246,0.08)]">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#8B5CF6]/3 rounded-full blur-3xl pointer-events-none" />
             
             {/* Left Content */}
@@ -370,7 +370,7 @@ export default function Home() {
                 </div>
                 
                 <h3 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-white mb-4">
-                  The Decentralization of Agent Context via MCP
+                  Open-source coding models are improving faster than proprietary alternatives this week.
                 </h3>
                 
                 <p className="text-sm md:text-base leading-relaxed text-[#94A3B8] mb-6 font-normal">
@@ -403,10 +403,9 @@ export default function Home() {
 
             {/* Right Confidence Score Dial */}
             <div className="w-full lg:w-[240px] flex flex-col items-center justify-center border-l lg:border-l border-white/[0.06] pl-0 lg:pl-8 pt-6 lg:pt-0">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 mb-4 block">Confidence Index</span>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 mb-4 block">Confidence Score</span>
               
               <div className="relative w-36 h-36 flex items-center justify-center">
-                {/* SVG circular bar */}
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" strokeWidth="6" fill="transparent" />
                   <circle
@@ -436,10 +435,74 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION 2: TRENDING TOPICS */}
+        {/* NEW FEATURE: AI OPPORTUNITY OF THE DAY */}
+        <section className="relative rounded-3xl p-0.5 overflow-hidden bg-gradient-to-r from-[#8B5CF6] via-[#22D3EE] to-[#34D399] shadow-[0_20px_50px_rgba(139,92,246,0.1)]">
+          <div className="bg-[#0C0F18] p-6 md:p-8 rounded-[22px] flex flex-col md:flex-row gap-8 justify-between">
+            {/* Left */}
+            <div className="md:w-1/3 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#22D3EE] mb-2 block">
+                  AI Opportunity of the Day
+                </span>
+                <h3 className="text-2xl font-plus-jakarta font-extrabold tracking-tight text-white leading-tight">
+                  Skill worth learning today
+                </h3>
+              </div>
+              <p className="text-xs text-[#94A3B8] mt-3 leading-relaxed">
+                Aggressive market search signals identifying technical proficiencies rising in enterprise demand.
+              </p>
+            </div>
+
+            {/* Middle */}
+            <div className="md:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <span className="text-[10px] font-bold text-[#C084FC] uppercase tracking-widest block mb-1">Skill</span>
+                <p className="text-base font-bold text-white">Model Context Protocol (MCP)</p>
+                
+                <span className="text-[10px] font-bold text-[#22D3EE] uppercase tracking-widest block mb-1 mt-4">Reason</span>
+                <p className="text-xs text-zinc-300">Mentions in enterprise developer postings increased 38% this week.</p>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-bold text-[#34D399] uppercase tracking-widest block mb-1">Adopters</span>
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {["Anthropic", "OpenAI", "Microsoft"].map((adopter) => (
+                    <span key={adopter} className="text-[10px] font-semibold text-white bg-white/[0.04] border border-white/[0.08] px-2 py-0.5 rounded">
+                      {adopter}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Est. Time</span>
+                    <span className="text-xs font-semibold text-white">20 minutes</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block">Career Impact</span>
+                    <span className="text-xs font-semibold text-[#34D399]">High</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right CTA */}
+            <div className="md:w-1/6 flex items-center justify-end">
+              <button
+                onClick={() => alert("Loading MCP quick-lesson module...")}
+                className="w-full md:w-auto px-5 py-3 rounded-xl font-bold bg-[#8B5CF6] hover:bg-[#7c4dff] text-white transition-all text-xs text-center"
+              >
+                Start Learning
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        {/* SECTION 2: MARKET SIGNALS (pills) */}
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">Trending Topics</h3>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8]">Market Signals</h3>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-4"></div>
           </div>
           
@@ -448,10 +511,10 @@ export default function Home() {
               { icon: "🤖", label: "AI Agents", trend: "+14.2%" },
               { icon: "⚡", label: "MCP", trend: "+32.6%", highlight: true },
               { icon: "💻", label: "Coding Models", trend: "+8.4%" },
-              { icon: "🧠", label: "LLMs", trend: "+12.1%" },
               { icon: "🎙", label: "Voice AI", trend: "+5.9%" },
-              { icon: "🚀", label: "Startups", trend: "+19.2%" },
-              { icon: "🦾", label: "Robotics", trend: "+11.7%" },
+              { icon: "🦾", label: "Robotics", trend: "+18.7%" },
+              { icon: "🧠", label: "Reasoning Models", trend: "+24.1%" },
+              { icon: "🏢", label: "Enterprise AI", trend: "+9.3%" },
             ].map((topic) => (
               <button
                 key={topic.label}
@@ -459,7 +522,7 @@ export default function Home() {
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-xs font-bold transition-all shrink-0 hover:scale-[1.02] ${
                   topic.highlight
                     ? "bg-[#8B5CF6]/10 border-[#8B5CF6]/30 text-[#C084FC]"
-                    : "bg-[#0F101A] border-white/[0.06] text-zinc-300 hover:border-zinc-700 hover:text-white"
+                    : "bg-[#121625] border-white/[0.06] text-zinc-300 hover:border-zinc-700 hover:text-white"
                 }`}
               >
                 <span>{topic.icon} {topic.label}</span>
@@ -471,7 +534,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* TOP STORIES SPLIT LAYOUT (FEED + SIDEBAR) */}
+        {/* SIGNAL FEED SPLIT LAYOUT (FEED + SIDEBAR) */}
         <section ref={feedRef} className="flex flex-col lg:flex-row gap-10">
           
           {/* Main Feed Left Column */}
@@ -480,7 +543,7 @@ export default function Home() {
             {/* Feed Header / Filters */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight text-white">Top Stories</h2>
+                <h2 className="text-2xl font-bold tracking-tight text-white">Signal Feed</h2>
                 <p className="text-xs text-[#94A3B8] mt-0.5">Scored by Noviqe proprietary engines</p>
               </div>
 
@@ -488,7 +551,7 @@ export default function Home() {
               <div className="flex flex-wrap items-center gap-3">
                 {/* Personalization Selector */}
                 {token && (
-                  <div className="bg-[#0F101A] border border-white/[0.06] rounded-xl p-1 flex">
+                  <div className="bg-[#121625] border border-white/[0.06] rounded-xl p-1 flex">
                     <button
                       onClick={() => setMode("discover")}
                       className={`px-3.5 py-1 rounded-lg text-xs font-bold transition-all ${
@@ -509,7 +572,7 @@ export default function Home() {
                 )}
 
                 {/* Sort selector */}
-                <div className="bg-[#0F101A] border border-white/[0.06] rounded-xl p-1 flex">
+                <div className="bg-[#121625] border border-white/[0.06] rounded-xl p-1 flex">
                   {SORTS.map((s) => (
                     <button
                       key={s.key}
@@ -570,7 +633,7 @@ export default function Home() {
               ))}
 
               {filteredArticles?.length === 0 && (
-                <div className="bg-[#0F101A] border border-white/[0.06] p-10 rounded-3xl text-center text-[#94A3B8] text-sm">
+                <div className="bg-[#121625] border border-white/[0.06] p-10 rounded-3xl text-center text-[#94A3B8] text-sm">
                   No briefings match your current active filters.
                 </div>
               )}
@@ -581,15 +644,15 @@ export default function Home() {
           {/* Right Sidebar Column */}
           <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
             
-            {/* Sidebar Block 1: Trending Now */}
-            <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-6 shadow-md">
+            {/* Sidebar Block 1: What's Happening */}
+            <div className="bg-[#121625] border border-white/[0.06] rounded-3xl p-6 shadow-md">
               <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]" />
-                Trending Now
+                What's Happening
               </h4>
               <div className="flex flex-col gap-4 text-xs font-normal">
                 {[
-                  { title: "OpenAI releases new voice capabilities for local applications.", velocity: "+22.4%" },
+                  { title: "Cursor Composer mode usage doubles in tech sector surveys.", velocity: "+22.4%" },
                   { title: "Meta leaks Llama 4 roadmap highlighting massive context window bounds.", velocity: "+18.1%" },
                   { title: "Standardizing MCP integrations receives support from tech leaders.", velocity: "+34.9%" },
                   { title: "Startup funding index spikes in robotics and physical automation.", velocity: "+12.2%" },
@@ -608,7 +671,7 @@ export default function Home() {
             </div>
 
             {/* Sidebar Block 2: Top Contributors */}
-            <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-6 shadow-md">
+            <div className="bg-[#121625] border border-white/[0.06] rounded-3xl p-6 shadow-md">
               <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE]" />
                 Top Contributors
@@ -631,7 +694,7 @@ export default function Home() {
             </div>
 
             {/* Sidebar Block 3: Quick Links */}
-            <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-6 shadow-md">
+            <div className="bg-[#121625] border border-white/[0.06] rounded-3xl p-6 shadow-md">
               <h4 className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] mb-4 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]" />
                 Quick Links
@@ -648,7 +711,7 @@ export default function Home() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 bg-[#161A2A]/40 hover:bg-[#161A2A]/80 border border-white/[0.04] hover:border-[#8B5CF6]/30 rounded-xl font-semibold text-center text-zinc-300 hover:text-white transition-all"
+                    className="p-2.5 bg-[#0C0F18]/60 hover:bg-[#0C0F18] border border-white/[0.04] hover:border-[#8B5CF6]/30 rounded-xl font-semibold text-center text-zinc-300 hover:text-white transition-all"
                   >
                     {link.name}
                   </a>
@@ -660,12 +723,12 @@ export default function Home() {
 
         </section>
 
-        {/* SECTION 4: RESEARCH WORTH READING */}
+        {/* SECTION 4: RESEARCH INTELLIGENCE */}
         <section ref={researchRef} className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#8B5CF6] block mb-1">Academic Contributions</span>
-              <h2 className="text-3xl font-plus-jakarta font-extrabold tracking-tight text-white">Research Worth Reading</h2>
+              <h2 className="text-3xl font-plus-jakarta font-extrabold tracking-tight text-white">Research Intelligence</h2>
             </div>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-6"></div>
           </div>
@@ -697,7 +760,7 @@ export default function Home() {
                 url: "https://arxiv.org/abs/1706.03762"
               }
             ].map((paper, idx) => (
-              <div key={idx} className="bg-[#0F101A] border border-white/[0.06] p-6 rounded-3xl hover:border-[#8B5CF6]/30 transition-all flex flex-col justify-between group">
+              <div key={idx} className="bg-[#121625] border border-white/[0.06] p-6 rounded-3xl hover:border-[#8B5CF6]/30 transition-all flex flex-col justify-between group">
                 <div>
                   <div className="flex items-center justify-between text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-4">
                     <span>{paper.confidence}</span>
@@ -713,7 +776,7 @@ export default function Home() {
                     href={paper.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full text-center py-2 bg-[#161A2A]/40 hover:bg-[#161A2A]/80 border border-white/[0.04] hover:border-[#8B5CF6]/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all block"
+                    className="w-full text-center py-2 bg-[#0C0F18]/60 hover:bg-[#0C0F18] border border-white/[0.04] hover:border-[#8B5CF6]/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all block"
                   >
                     Read Paper &rarr;
                   </a>
@@ -723,28 +786,28 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION 5: COMPANIES TO WATCH */}
+        {/* SECTION 5: COMPANY WATCHLIST */}
         <section ref={companiesRef} className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#22D3EE] block mb-1">Corporate Tracker</span>
-              <h2 className="text-3xl font-plus-jakarta font-extrabold tracking-tight text-white">Companies to Watch</h2>
+              <h2 className="text-3xl font-plus-jakarta font-extrabold tracking-tight text-white">Company Watchlist</h2>
             </div>
             <div className="h-[1px] bg-white/[0.06] flex-1 ml-6"></div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: "OpenAI", momentum: "9.8/10", launch: "GPT-4o realtime API", hiring: "Accelerating", funding: "$6.6B raised", news: "Signed key news partnerships" },
-              { name: "Anthropic", momentum: "9.9/10", launch: "Claude 3.5 Sonnet & MCP", hiring: "High demand", funding: "$4B from Amazon", news: "Leading developer protocol standard" },
-              { name: "Google DeepMind", momentum: "9.4/10", launch: "AlphaFold 3 code release", hiring: "Selective", funding: "Internal Alphabet", news: "Focusing on science & biology integrations" },
-              { name: "Meta AI", momentum: "9.5/10", launch: "Llama 3.1 405B base", hiring: "Steady", funding: "Internal Meta", news: "Committed to open source releases" },
-              { name: "Mistral", momentum: "8.9/10", launch: "Codestral 22B coder", hiring: "Moderate", funding: "$640M raised", news: "Strengthening EU partnerships" },
-              { name: "Cursor", momentum: "9.7/10", launch: "Composer tab & loops", hiring: "Rapid", funding: "$30M Series A", news: "Surpassing traditional editor shares" },
+              { name: "OpenAI", momentum: "9.8/10", launch: "GPT-4o realtime API", hiring: "Accelerating", funding: "$6.6B raised", news: "Signed key news partnerships", focus: "General Intelligence" },
+              { name: "Anthropic", momentum: "9.9/10", launch: "Claude 3.5 Sonnet & MCP", hiring: "High demand", funding: "$4B from Amazon", news: "Leading developer protocol standard", focus: "Safety & Agentic Workspaces" },
+              { name: "Google DeepMind", momentum: "9.4/10", launch: "AlphaFold 3 code release", hiring: "Selective", funding: "Alphabet backed", news: "Focusing on science & biology integrations", focus: "Scientific & Foundational Models" },
+              { name: "Meta AI", momentum: "9.5/10", launch: "Llama 3.1 405B base", hiring: "Steady", funding: "Meta backed", news: "Committed to open source releases", focus: "Open Access Systems" },
+              { name: "Mistral", momentum: "8.9/10", launch: "Codestral 22B coder", hiring: "Moderate", funding: "$640M raised", news: "Strengthening EU partnerships", focus: "Efficient Edge Models" },
+              { name: "Cursor", momentum: "9.7/10", launch: "Composer tab & loops", hiring: "Rapid", funding: "$30M Series A", news: "Surpassing traditional editor shares", focus: "AI Developer Tooling" },
             ].map((company) => (
               <div
                 key={company.name}
-                className="bg-[#0F101A] border border-white/[0.06] p-5 rounded-3xl hover:border-[#8B5CF6]/30 hover:bg-[#0F101A]/80 transition-all flex flex-col justify-between gap-4 group"
+                className="bg-[#121625] border border-white/[0.06] p-5 rounded-3xl hover:border-[#8B5CF6]/30 hover:bg-[#121625]/80 transition-all flex flex-col justify-between gap-4 group"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -760,27 +823,96 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="border-t border-white/[0.04] pt-3 text-[11px]">
-                  <span className="text-zinc-500 block">Latest: <strong className="text-zinc-300 font-medium">{company.launch}</strong></span>
-                  <span className="text-zinc-500 block mt-0.5">News: <strong className="text-zinc-400 font-normal">{company.news}</strong></span>
+                  <span className="text-zinc-500 block">AI Focus: <strong className="text-zinc-300 font-medium">{company.focus}</strong></span>
+                  <span className="text-zinc-500 block mt-0.5">Latest: <strong className="text-zinc-300 font-medium">{company.launch}</strong></span>
+                  <span className="text-zinc-500 block mt-0.5">Updates: <strong className="text-zinc-400 font-normal">{company.news}</strong></span>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* SECTION 6: TODAY'S LEARNING */}
+        {/* SECTION: MODEL INTELLIGENCE (NEW MODELS SECTION) */}
+        <section ref={modelsRef} className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#8B5CF6] block mb-1">Model Tracker</span>
+              <h2 className="text-3xl font-plus-jakarta font-extrabold tracking-tight text-white">Model Intelligence</h2>
+            </div>
+            <div className="h-[1px] bg-white/[0.06] flex-1 ml-6"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Claude 3.5 Sonnet",
+                maker: "Anthropic",
+                version: "v3.5 Sonnet (June 2026)",
+                capabilities: "State-of-the-art coding, logical reasoning, multi-step instruction compliance.",
+                adoption: "Surging (+42% developer deployment)",
+                community: "Bullish (Preferred for Cursor/copilots)",
+                performance: "Top scoring on SWE-bench and human-eval logic tests."
+              },
+              {
+                name: "GPT-4o",
+                maker: "OpenAI",
+                version: "gpt-4o-realtime (May 2026)",
+                capabilities: "Low-latency voice/audio processing, real-time multimodal token streams.",
+                adoption: "Stable (+18% production volume)",
+                community: "High (Broad consumer & API base)",
+                performance: "Leading response speeds and speech token synthesis quality."
+              },
+              {
+                name: "Llama 3.1 405B",
+                maker: "Meta AI",
+                version: "3.1-405B-Instruct",
+                capabilities: "Local fine-tuning, synthetic data generation generation pipelines, self-hosting.",
+                adoption: "Surging (+31% enterprise local installations)",
+                community: "Exponential open-weights ecosystem",
+                performance: "Beats proprietary baselines when fine-tuned on custom domains."
+              }
+            ].map((model, idx) => (
+              <div key={idx} className="bg-[#121625] border border-white/[0.06] p-6 rounded-3xl hover:border-[#8B5CF6]/30 transition-all flex flex-col justify-between group">
+                <div>
+                  <div className="flex items-center justify-between text-[10px] font-bold text-[#C084FC] uppercase tracking-widest mb-3">
+                    <span>{model.maker}</span>
+                    <span className="text-zinc-500 font-semibold">{model.version}</span>
+                  </div>
+                  <h4 className="text-lg font-display font-extrabold text-white mb-2 group-hover:text-[#C084FC] transition-colors">{model.name}</h4>
+                  <p className="text-xs text-[#94A3B8] leading-relaxed mb-4">{model.capabilities}</p>
+                </div>
+                <div className="border-t border-white/[0.04] pt-4 mt-auto text-xs flex flex-col gap-2">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500 font-medium">Adoption Trend:</span>
+                    <span className="font-semibold text-white">{model.adoption}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500 font-medium">Community Growth:</span>
+                    <span className="font-semibold text-white">{model.community}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500 font-medium">Performance:</span>
+                    <span className="font-semibold text-[#34D399] text-right">{model.performance}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SECTION 6: LEARN WHAT'S NEXT */}
         <section ref={learningRef} className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           
           {/* Featured learning card */}
-          <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-7 md:p-8 flex flex-col justify-between hover:border-[#8B5CF6]/30 transition-all relative overflow-hidden">
+          <div className="bg-[#121625] border border-white/[0.06] rounded-3xl p-7 md:p-8 flex flex-col justify-between hover:border-[#8B5CF6]/30 transition-all relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-[#8B5CF6]/4 rounded-full blur-xl pointer-events-none" />
             
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#8B5CF6] bg-[#8B5CF6]/10 px-3.5 py-0.5 rounded-full">
-                  Education Hub
+                  Learn What's Next
                 </span>
-                <span className="text-[10px] text-zinc-500 font-semibold">5 Minutes Reading</span>
+                <span className="text-[10px] text-zinc-500 font-semibold">5 Minutes · Intermediate</span>
               </div>
               
               <h3 className="text-2xl font-display font-extrabold text-white mb-3">What is MCP?</h3>
@@ -800,12 +932,12 @@ export default function Home() {
               onClick={() => alert("Loading Novique Learning Lesson: Introduction to MCP...")}
               className="py-2.5 px-4 bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] hover:border-[#8B5CF6]/30 rounded-xl text-xs font-bold text-zinc-300 hover:text-white transition-all text-center"
             >
-              Read Lesson
+              Start Learning
             </button>
           </div>
 
           {/* WEEKLY INTELLIGENCE REPORT */}
-          <div className="bg-[#0F101A] border border-white/[0.06] rounded-3xl p-7 md:p-8 flex flex-col justify-between hover:border-[#8B5CF6]/30 transition-all shadow-xl">
+          <div className="bg-[#121625] border border-white/[0.06] rounded-3xl p-7 md:p-8 flex flex-col justify-between hover:border-[#8B5CF6]/30 transition-all shadow-xl">
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#22D3EE] block mb-2">Weekly Synthesis</span>
               <h3 className="text-2xl font-display font-extrabold text-white mb-5">Weekly Intelligence</h3>
@@ -816,7 +948,7 @@ export default function Home() {
                   <span className="font-semibold text-[#C084FC]">Anthropic</span>
                 </div>
                 <div className="flex justify-between border-b border-white/[0.04] pb-2">
-                  <span className="text-zinc-500 font-medium">Top Paper</span>
+                  <span className="text-zinc-500 font-medium">Top Research Paper</span>
                   <span className="font-semibold text-white">KAN (Kolmogorov-Arnold Networks)</span>
                 </div>
                 <div className="flex justify-between border-b border-white/[0.04] pb-2">
@@ -869,7 +1001,7 @@ export default function Home() {
       {/* AUTHENTICATION MODAL */}
       {isAuthModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-md bg-[#0F101A] border border-white/[0.08] rounded-3xl p-8 shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
+          <div className="relative w-full max-w-md bg-[#121625] border border-white/[0.08] rounded-3xl p-8 shadow-[0_24px_60px_rgba(0,0,0,0.6)]">
             {/* Close Button */}
             <button
               onClick={() => {

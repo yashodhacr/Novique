@@ -9,8 +9,8 @@ const config: Config = {
     extend: {
       colors: {
         ink: "#070711",
-        panel: "#0F101A",
-        panelSecondary: "#161A2A",
+        secondaryBg: "#0C0F18",
+        panel: "#121625",
         edge: "rgba(255,255,255,0.06)",
         muted: "#94A3B8",
         accent: "#8B5CF6",

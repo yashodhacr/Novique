@@ -13,6 +13,8 @@ export default function Home() {
   const { token } = useAuth();
   const qc = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sort, setSort] = useState<"impact" | "trend" | "recent">("recent");
+  const [kind, setKind] = useState<"all" | "news" | "paper">("all");
 
   // Brief Countdown Timer State (5 minutes loop)
   const [secondsLeft, setSecondsLeft] = useState(300);
@@ -30,10 +32,10 @@ export default function Home() {
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  // Fetch Signals (Discover default on home)
+  // Fetch Signals (Discover default on home, now dynamic)
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["feed", "discover", "impact", "all", !!token],
-    queryFn: () => fetchFeed("impact", "all"),
+    queryKey: ["feed", "discover", sort, kind, !!token],
+    queryFn: () => fetchFeed(sort, kind),
   });
 
   // Bookmark & interest states for cards
@@ -286,6 +288,53 @@ export default function Home() {
             <Link href="/signals" className="text-xs font-semibold text-[#6C63FF] hover:text-[#5a54e5] flex items-center gap-1.5">
               View All Signals &rarr;
             </Link>
+          </div>
+
+          {/* Filter Panel */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#101B2D] border border-white/[0.05] p-3 rounded-2xl">
+            {/* Left: Sort tabs */}
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mr-2 ml-1">Sort:</span>
+              {[
+                { key: "recent", label: "⏱️ Latest" },
+                { key: "impact", label: "🔥 Top Impact" },
+                { key: "trend", label: "📈 Trending" },
+              ].map((s) => (
+                <button
+                  key={s.key}
+                  onClick={() => setSort(s.key as any)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    sort === s.key
+                      ? "bg-white/10 text-white"
+                      : "text-[#9AA8BD] hover:text-white"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Right: Kind filter */}
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mr-2 ml-1">Type:</span>
+              {[
+                { key: "all", label: "All Items" },
+                { key: "news", label: "News" },
+                { key: "paper", label: "Papers" },
+              ].map((k) => (
+                <button
+                  key={k.key}
+                  onClick={() => setKind(k.key as any)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    kind === k.key
+                      ? "bg-white/10 text-white"
+                      : "text-[#9AA8BD] hover:text-white"
+                  }`}
+                >
+                  {k.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {isLoading && <p className="text-zinc-500 text-sm">Querying signals...</p>}
